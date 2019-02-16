@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name            Smart Chute
+// @name            SmartChute
 // @version         19.2.1
 // @description     BitChute.com Enhancer. Makes you feel warm.
 // @license         MIT
 // @compatible      firefox
 // @compatible      chrome
+// @compatible      opera
 // @namespace       https://github.com/s-marty/SmartChute
 // @homepageURL     https://github.com/s-marty/SmartChute
 // @supportURL      https://github.com/s-marty/SmartChute/wiki
@@ -44,7 +45,7 @@
 
 ***  ***  Does not & will not work well with IE and IEdge  ***/
 
-// Editable options
+//Editable options
 var hide_Cookie_Notice = true;
 var hide_Donation_Bar = true;
 // End Editable options
@@ -86,7 +87,6 @@ var hide_Donation_Bar = true;
                 },{ subtree: false, childList: false, attributes : true, attributeFilter : ['style'] });
             }
             if (! (BC.homepage || BC.watchpage || BC.channelpage || BC.categorypage || BC.profilepage || BC.searchpage)) return;
-            if (hide_Cookie_Notice) hideCookieNotice();
             setTimeout(addThemeListeners, 2000);
             if (isChrome && BC.settings.hidemenubar) {
                 window.addEventListener('beforeunload', function(e){
@@ -96,19 +96,21 @@ var hide_Donation_Bar = true;
             setTheme();
             setPreferencesCookie("autoplay", BC.settings.playnext);
             if (BC.searchpage || BC.profilepage) return;
-            let style       = d.createElement("style");
-            style.type      = "text/css";
-            style.innerText = '.nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {border: 1px solid #f37835; border-radius: 5px; }' +
-                              '#loader-container {opacity: 0.5;} span.add-to-blacklist { position: absolute; top: 4px; left: 4px; z-index: 50; width:30px; height:30px; } a.side-toggle {cursor: pointer; }' +
-                              'span.blacklist-tooltip { position: absolute; font-size: 14px;width: 60px; height: 22px; left: 2px; top: 38px; line-height: 1.6; background-color: #000 ;display:none; }' +
-                              'span.add-to-blacklist svg { cursor: pointer; } html.noblacklist span.add-to-blacklist {display:none; } #channel-list div.item div.channel-card:hover .add-to-blacklist {opacity: 1; }' +
-                              'span.add-to-blacklist:hover span.blacklist-tooltip { color:#fff; display:inline; } #carousel {'+(BC.settings.hidecarousel ? "display:none" : "width: 100%; min-height: 210px" )+';}';
+            let style = d.createElement("style");
+            style.type = "text/css";
+            style.innerText = '\
+                    .nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {border: 1px solid #f37835; border-radius: 5px; }svg.smarty-donate:hover {-webkit-transform: rotate(7deg);transform: rotate(7deg);}\
+                    #loader-container {opacity: 0.5;} span.add-to-blacklist { position: absolute; top: 4px; left: 4px; z-index: 50; width:30px; height:30px; } a.side-toggle {cursor: pointer; } svg.smarty-donate {float:right;cursor: pointer;}\
+                    span.blacklist-tooltip { position: absolute; font-size: 14px;width: 60px; height: 22px; left: 2px; top: 38px; line-height: 1.6; background-color: #000 ;display:none; }\
+                    span.add-to-blacklist svg { cursor: pointer; } html.noblacklist span.add-to-blacklist {display:none; } #channel-list div.item div.channel-card:hover .add-to-blacklist {opacity: 1; }\
+                    span.add-to-blacklist:hover span.blacklist-tooltip { color:#fff; display:inline; } #carousel {'+(BC.settings.hidecarousel ? "display:none" : "width: 100%; min-height: 210px" )+';}';
             if (BC.settings.hidemenubar) {
-                style.innerText += '#nav-top-menu {position: static; width: 100%; height: 60px;} #nav-menu-buffer {height: 0px; padding-top: 0px !important;; } ' +
-                                   'html.topNavfloat #nav-top-menu, html.tabNavfloat .tab-scroll-outer {-webkit-transition: top 0.5s ease-in-out; -moz-transition: top 0.5s ease-in-out; -o-transition: top 0.5s ease-in-out; transition: top 0.5s ease-in-out;}' +
-                                   'html.topNavfloat #nav-top-menu {position: fixed; /*background: #211f22 !important;*/ } html.tabNavfloat .tab-scroll-outer {position: fixed; width: 100%; z-index:989; background: #fff; } ' +
-                                   'html.tabNavfloat.night .tab-scroll-outer {background: #211f22; }' +
-                                   'html.topNavfloat #nav-menu {padding-top: 60px; } html.tabNavfloat #page-detail .tab-content {margin-top: 50px; } html.tabNavfloat #page-detail #listing-trending {margin-top: -50px; } html.tabNavfloat #nav-side-menu {z-index:999; }';
+                style.innerText += '\
+                    #nav-top-menu {position: static; width: 100%; height: 60px;} #nav-menu-buffer {height: 0px; padding-top: 0px !important;; }\
+                    html.topNavfloat #nav-top-menu, html.tabNavfloat .tab-scroll-outer {-webkit-transition: top 0.5s ease-in-out; -moz-transition: top 0.5s ease-in-out; -o-transition: top 0.5s ease-in-out; transition: top 0.5s ease-in-out;}\
+                    html.topNavfloat #nav-top-menu {position: fixed; /*background: #211f22 !important;*/ } html.tabNavfloat .tab-scroll-outer {position: fixed; width: 100%; z-index:989; background: #fff; }\
+                    html.tabNavfloat.night .tab-scroll-outer {background: #211f22; }\
+                    html.topNavfloat #nav-menu {padding-top: 60px; } html.tabNavfloat #page-detail .tab-content {margin-top: 50px; } html.tabNavfloat #page-detail #listing-trending {margin-top: -50px; } html.tabNavfloat #nav-side-menu {z-index:999; }';
             }
             if (BC.settings.playlists) {
                 style.innerText += '\
@@ -120,12 +122,9 @@ var hide_Donation_Bar = true;
                     .night .mvplaylist .playlistbtn.disabled b {color: #2c2a2d;} @media (min-width: 768px) {.mvplaylist .mvslider {max-width: 660px;} .mvplaylist .playlistup {margin-left:475px;}}\
                     @media (min-width: 992px) {.mvplaylist .mvslider {max-width: 878px;} .mvplaylist .playlistup {margin-left:693px;}}';
             }
-            if (BC.settings.hideadverts) {
-                style.innerText += '.sidebar .rcad-container {display:none !important;}';
-            }
-            if (hide_Donation_Bar) {
-                style.innerText += '.video-container .text-center { display: none !important; }';
-            }
+            if (BC.settings.hideadverts) style.innerText += '.sidebar .rcad-container {display:none !important;}';
+            if (hide_Donation_Bar) style.innerText += '.video-container .text-center {display: none !important;}';
+            if (hide_Cookie_Notice) style.innerText += '#alert-cookie {display: none !important; }';
             d.documentElement.appendChild(style);
             if (BC.settings.hidemenubar) window.addEventListener('scroll', floatHeaders);
             BC.loaded = 1;
@@ -154,16 +153,17 @@ var hide_Donation_Bar = true;
                             d.addEventListener("fullscreenchange", () => { onFullScreen()});
                             d.addEventListener("mozfullscreenchange", () => { onFullScreen()});
                             d.addEventListener("webkitfullscreenchange", () => { onFullScreen()});
-                            let style       = d.createElement("style");
-                            style.type      = "text/css";
-                            style.innerText = 'html:not(.isfullscreen).s-marty-miniplayer video#player, html:not(.isfullscreen).s-marty-miniplayer .plyr__video-wrapper {opacity: 0.97;}' +
-                              'html:not(.isfullscreen).s-marty-miniplayer .video-container .wrapper {position: fixed;z-index: 100;background-color:transparent;' +
-                              'border:1px solid rgba(255,255,255,.3);box-shadow:0 4px 5px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12),0 2px 4px -1px rgba(0,0,0,.4)}' +
-                              'html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar {display : block;cursor: move; height: 40px; left: -3px; right: 5px; top: -6px; position: absolute;z-index: 110;background-color:transparent;}' +
-                              'html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar:hover {background-color:#000; opacity: 0.4; background-clip: padding-box; padding: 6px 0 0 6px;}' +
-                              'html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-size {display : block;cursor: nesw-resize; width:7px; height: 7px; right: -3px; top: -3px; position: absolute;z-index: 120;background-color:transparent;}' +
-                              'html:not(.s-marty-miniplayer) #s-marty-miniplayer-bar, html:not(.s-marty-miniplayer) #s-marty-miniplayer-size {display : none;} html:not(.isfullscreen).s-marty-miniplayer .plyr__volume {max-width:12% !important;}' +
-                              'html.isfullscreen video#player {width: 100% !important; height: !important;}';
+                            let style = d.createElement("style");
+                            style.type = "text/css";
+                            style.innerText = '\
+                                html:not(.isfullscreen).s-marty-miniplayer video#player, html:not(.isfullscreen).s-marty-miniplayer .plyr__video-wrapper {opacity: 0.97;}\
+                                html:not(.isfullscreen).s-marty-miniplayer .video-container .wrapper {position: fixed;z-index: 100;background-color:transparent;\
+                                border:1px solid rgba(255,255,255,.3);box-shadow:0 4px 5px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12),0 2px 4px -1px rgba(0,0,0,.4)}\
+                                html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar {display : block;cursor: move; height: 40px; left: -3px; right: 5px; top: -6px; position: absolute;z-index: 110;background-color:transparent;}\
+                                html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar:hover {background-color:#000; opacity: 0.4; background-clip: padding-box; padding: 6px 0 0 6px;}\
+                                html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-size {display : block;cursor: nesw-resize; width:7px; height: 7px; right: -3px; top: -3px; position: absolute;z-index: 120;background-color:transparent;}\
+                                html:not(.s-marty-miniplayer) #s-marty-miniplayer-bar, html:not(.s-marty-miniplayer) #s-marty-miniplayer-size {display : none;} html:not(.isfullscreen).s-marty-miniplayer .plyr__volume {max-width:12% !important;}\
+                                html.isfullscreen video#player {width: 100% !important; height: !important;}';
                             d.documentElement.appendChild(style);
                             BC.miniPlayerIni = true;
                         }
@@ -194,7 +194,10 @@ var hide_Donation_Bar = true;
                     if (playPromise !== undefined) {
                         playPromise.then(function() {
                         }).catch(function(error) {
-                            //User must click the first video now
+                            if (BC.player.api.readyState < 3) {
+                                BC.player.api.addEventListener('canplay', function(e) {BC.player.api.play();}, false);
+                                //User must click the first video now
+                            }
                         });
                     }
                 }
@@ -320,9 +323,12 @@ var hide_Donation_Bar = true;
         let i;
         let blacklisted;
         let blContent = '';
+        let donate = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"><svg class="smarty-donate" version="1.0" xmlns="http://www.w3.org/2000/svg" width="14pt" height="14pt" viewBox="0 0 496 512" preserveAspectRatio="xMidYMid meet"><g transform="translate(248 256)"><g transform="translate(0, 0)  scale(1, 1)  rotate(-7 7 7)">'+
+            '<path fill="#30a247" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm24 376v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16.2c-16.5-.6-32.6-5.8-46.4-15.1-8.7-5.9-10-18.1-2.3-25.2l12-11.3c5.4-5.1 13.3-5.4 19.7-1.6 6.1 3.6 12.9 5.4 19.9 5.4h45c11.3 0 20.5-10.5 20.5-23.4 0-10.6-6.3-19.9-15.2-22.7L205 268c-29-8.8-49.2-37-49.2-68.6 0-39.3 30.6-71.3 68.2-71.4v-16c0-8.8 '+
+            '7.2-16 16-16h16c8.8 0 16 7.2 16 16v16.2c16.5.6 32.6 5.8 46.4 15.1 8.7 5.9 10 18.1 2.3 25.2l-12 11.3c-5.4 5.1-13.3 5.4-19.7 1.6-6.1-3.6-12.9-5.4-19.9-5.4h-45c-11.3 0-20.5 10.5-20.5 23.4 0 10.6 6.3 19.9 15.2 22.7l72 21.9c29 8.8 49.2 37 49.2 68.6.2 39.3-30.4 71.2-68 71.4z" transform="translate(-248 -256)"></path></g></g><title>Donate to Smarty</title></svg>';
         let tabContent = '<a href="javascript:void(0)">Smarty</a><div id="smarty_tab" class="modal-content" style="display: none; position: absolute; z-index: 200;">'+
               '<div style="width: 170px; padding: 8px; border: 1px solid #333; border-radius:3px;">'+
-                '<input name="useblacklist" id="useblacklist2" type="checkbox"'+(BC.settings.useblacklist ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="useblacklist2">&nbsp;Use Blacklist</label><br>'+
+                '<input name="useblacklist" id="useblacklist2" type="checkbox"'+(BC.settings.useblacklist ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="useblacklist2">&nbsp;Use Blacklist</label>'+donate+'<br>'+
                 '<input name="hidemenubar" id="hidemenubar2" type="checkbox"'+(BC.settings.hidemenubar ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="hidemenubar2">&nbsp;Scroll Menubar</label><br>'+
                 '<input name="hidecarousel" id="hidecarousel2" type="checkbox"'+(BC.settings.hidecarousel ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="hidecarousel2">&nbsp;Hide Carousel</label><br>'+
                 '<input name="hidecomments" id="hidecomments2" type="checkbox"'+(BC.settings.hidecomments ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="hidecomments2">&nbsp;Hide Comments</label><br>'+
@@ -363,6 +369,7 @@ var hide_Donation_Bar = true;
             smarty.querySelector('#hideadverts2').addEventListener('change', function(e) {toggleSettings('hideadverts',e.target.checked)}, false);
             smarty.querySelector('#playlists2').addEventListener('change', function(e) {savePlayerValue('playlists',e.target.checked)}, false);
             smarty.querySelector('#autoplay2').addEventListener('change', function(e) {savePlayerValue('autoplay',e.target.checked)}, false);
+            smarty.querySelector('svg').addEventListener('click', function(e) {window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QHFFSLZ7ENUQN&source=url', '_blank');}, false);
             let colors = smarty.querySelectorAll('input[type=radio][name=color]');
             for (i = 0; i < colors.length; i++) {
                 colors[i].addEventListener('change', function(e) {toggleSettings('color',this.value)}, false);
@@ -632,16 +639,6 @@ var hide_Donation_Bar = true;
         }));
     }
 
-    var persistTryHCC = 0;
-    function hideCookieNotice(e) {
-        BC.cookies = qs('#alert-cookie');
-        if (BC.cookies != null) {
-            BC.cookies.style.display = 'none';
-            persistTryHCC = 0;
-        }
-        else if (persistTryHCC++ < 30) window.setTimeout(hideCookieNotice, 1000);
-    }
-
     function miniPlayer() {
         let show_mini = pageYOffset > BC.player.api.mini_point;
         let is_mini = d.documentElement.classList.contains("s-marty-miniplayer")
@@ -796,21 +793,24 @@ var hide_Donation_Bar = true;
         }
         if (!isTheme && BC.settings.color != 'none') {
             isTheme = true;
-            let colours = {'orange':{light:'#ef4136',lighter:'#f37835',lightest:'#f0af5a'},
-                            'green':{light:'#46a604',lighter:'#35c453',lightest:'#55a47c'},
-                             'blue':{light:'#2532e0',lighter:'#2567e0',lightest:'#559bcc'}};
-            let style       = d.createElement("style");
-            style.type      = "text/css";
-            style.innerText = '.night .sidebar-heading, .night .subscribe-button, .night .btn-danger, .night #loader ul li {background-color: '+colours[BC.settings.color].light+';}'+
-                              '.night a:hover, .night .scripted-link:hover {color: '+colours[BC.settings.color].light+' !important;} .night .nav-tabs>li.active {border-bottom-color:'+colours[BC.settings.color].light+';}' +
-                              '.night body, .night .video-card .video-card-text, .night .video-card .video-card-text p i, .night .notify-button, ' +
-                              '.night .channel-notify-button, .night .channel-videos-details, .night .channel-videos-title a, .night .channel-videos-text, ' +
-                              '.night .video-trending-details, .night .video-trending-title a, .night .video-trending-channel a, .night .video-trending-text, ' +
-                              '.night .playlist-video .details, .night .playlist-video .title a, .night .playlist-video .channel a, .night .playlist-video .description, ' +
-                              '.night .video-detail-text p, .night .video-information .sharing-drop span, .night .search-box .form-control { color: '+colours[BC.settings.color].lightest+'; }' +
-                              '.night a:link, .night a:active, .night a:visited, .night a:focus, .night .scripted-link, .night #nav-top-menu .unauth-link a, ' +
-                              '.night .video-card .video-card-text a, .night #nav-top-menu .user-link a, #day-theme a svg { color: '+colours[BC.settings.color].lighter+'; }' +
-                              '.night .tags ul li a, .night #show-comments {background-color: #3b383c; border-radius:5px;} .night .tags ul li a:hover {background-color: #4d484e;} .creator-monetization {color: #30a247;}';
+            let colours = {
+                'orange':{light:'#ef4136',lighter:'#f37835',lightest:'#f0af5a'},
+                 'green':{light:'#46a604',lighter:'#35c453',lightest:'#55a47c'},
+                  'blue':{light:'#2532e0',lighter:'#2567e0',lightest:'#559bcc'}
+            };
+            let style = d.createElement("style");
+            style.type = "text/css";
+            style.innerText = '\
+                .night .sidebar-heading, .night .subscribe-button, .night .btn-danger, .night #loader ul li {background-color: '+colours[BC.settings.color].light+';}\
+                .night a:hover, .night .scripted-link:hover {color: '+colours[BC.settings.color].light+' !important;} .night .nav-tabs>li.active {border-bottom-color:'+colours[BC.settings.color].light+';}\
+                .night body, .night .video-card .video-card-text, .night .video-card .video-card-text p i, .night .notify-button, \
+                .night .channel-notify-button, .night .channel-videos-details, .night .channel-videos-title a, .night .channel-videos-text, \
+                .night .video-trending-details, .night .video-trending-title a, .night .video-trending-channel a, .night .video-trending-text, \
+                .night .playlist-video .details, .night .playlist-video .title a, .night .playlist-video .channel a, .night .playlist-video .description, \
+                .night .video-detail-text p, .night .video-information .sharing-drop span, .night .search-box .form-control { color: '+colours[BC.settings.color].lightest+'; }\
+                .night a:link, .night a:active, .night a:visited, .night a:focus, .night .scripted-link, .night #nav-top-menu .unauth-link a, \
+                .night .video-card .video-card-text a, .night #nav-top-menu .user-link a, #day-theme a svg { color: '+colours[BC.settings.color].lighter+'; }\
+                .night .tags ul li a, .night #show-comments {background-color: #3b383c; border-radius:5px;} .night .tags ul li a:hover {background-color: #4d484e;} .creator-monetization {color: #30a247;}';
             d.documentElement.appendChild(style);
         }
     }
