@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            SmartChute
 // @version         19.2.1
-// @description     BitChute.com Enhancer. Adds missimg features. Makes you feel warm.
+// @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @compatible      firefox
 // @compatible      chrome
