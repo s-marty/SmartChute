@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            SmartChute
 // @version         19.2.1
-// @description     BitChute.com Enhancer. Makes you feel warm.
+// @description     BitChute.com Enhancer. Adds missimg features. Makes you feel warm.
 // @license         MIT
 // @compatible      firefox
 // @compatible      chrome
@@ -45,10 +45,10 @@
 
 ***  ***  Does not & will not work well with IE and IEdge  ***/
 
-//Editable options
+/* Editable options */
 var hide_Cookie_Notice = true;
 var hide_Donation_Bar = true;
-// End Editable options
+/* End Editable options */
 
 (function() {
     "use strict";
@@ -84,7 +84,7 @@ var hide_Donation_Bar = true;
             if (loader = qs("#loader-container")) {
                 addListener(loader, function(e) {
                     if (e.target.style.opacity == 0.5 && e.target.style.display == 'block') chuteMePlease(e)
-                },{ subtree: false, childList: false, attributes : true, attributeFilter : ['style'] });
+                },{ attributes : true, attributeFilter : ['style'] });
             }
             if (! (BC.homepage || BC.watchpage || BC.channelpage || BC.categorypage || BC.profilepage || BC.searchpage)) return;
             setTimeout(addThemeListeners, 2000);
@@ -255,7 +255,7 @@ var hide_Donation_Bar = true;
                             applyBlacklist('#listing-all > div.row > div');
                         }
                     }
-                }),{ childList: true, subtree: false, characterData: false, attributes : false };
+                },{ childList: true });
 
                 addListener(listingsPopular, function(e) {
                     if (BC.settings.useblacklist) {
@@ -266,7 +266,7 @@ var hide_Donation_Bar = true;
                             applyBlacklist('#listing-popular > div.row > div');
                         }
                     }
-                }),{ childList: true, subtree: false, characterData: false, attributes : false };
+                },{ childList: true });
 
                 BC.listenersIni = true;
             }
@@ -1036,9 +1036,7 @@ var hide_Donation_Bar = true;
     function qsa(selector) { return document.querySelectorAll(selector) }
 
     function addListener(target, fn, config) {
-        var cfg = (typeof config != 'object') ? {
-            attributes: true, childList: true, characterData: true, subtree: true
-        } : config;
+        var cfg = {...{attributes:!1, childList:!1, characterData:!1, subtree:!1}, ...config};
         var observer = new MutationObserver(function(mutations) {
           mutations.forEach(function(mutation) {  fn(mutation)  })});
         observer.observe(target, cfg);
