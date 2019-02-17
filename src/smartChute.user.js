@@ -3,6 +3,7 @@
 // @version         19.2.1
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
+// @author          S-Marty
 // @compatible      firefox
 // @compatible      chrome
 // @compatible      opera
