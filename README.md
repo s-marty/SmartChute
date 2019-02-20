@@ -34,6 +34,8 @@ Most features are selectable using the Smarty menu.
 * Top ten most viewed channel video playlist on video page
 * 32 More video choices on Video watch page vs. 6
 * Unlimited video choices using "SHOW MORE" button, vs. 6
+* OpenSearch browser search to search from address or search bar
+* Rss channel feed subscribe link
 * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Smarty menu always available
 
 
