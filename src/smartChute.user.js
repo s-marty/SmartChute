@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         19.2.1
+// @version         19.2.19
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -19,7 +19,6 @@
 // @grant           GM.setValue
 // @noframes
 // ==/UserScript==
-
 
 /** **********************   Features   **********************
 *** Accelerated Bit Chute user experience ahead
@@ -42,13 +41,16 @@
 *** Top ten most viewed channel video playlist on video page
 *** 32 More video choices on Video watch page vs. 6
 *** Unlimited video choices using "SHOW MORE" button, vs. 6
+*** OpenSearch browser search to search from address or search bar
+*** Rss channel feed subscribe link
 ***          Smarty menu always available
 
 ***  ***  Does not & will not work well with IE and IEdge  ***/
 
 /* Editable options */
-var hide_Cookie_Notice = true;
-var hide_Donation_Bar = true;
+var hide_Cookie_Notice = false;
+var hide_Donation_Bar = false;
+var use_Square_Icons = false;
 /* End Editable options */
 
 (function() {
@@ -100,18 +102,20 @@ var hide_Donation_Bar = true;
             let style = d.createElement("style");
             style.type = "text/css";
             style.innerText = '\
-                    .nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {border: 1px solid #f37835; border-radius: 5px; }svg.smarty-donate:hover {-webkit-transform: rotate(7deg);transform: rotate(7deg);}\
-                    #loader-container {opacity: 0.5;} span.add-to-blacklist { position: absolute; top: 4px; left: 4px; z-index: 50; width:30px; height:30px; } a.side-toggle {cursor: pointer; } svg.smarty-donate {float:right;cursor: pointer;}\
-                    span.blacklist-tooltip { position: absolute; font-size: 14px;width: 60px; height: 22px; left: 2px; top: 38px; line-height: 1.6; background-color: #000 ;display:none; }\
-                    span.add-to-blacklist svg { cursor: pointer; } html.noblacklist span.add-to-blacklist {display:none; } #channel-list div.item div.channel-card:hover .add-to-blacklist {opacity: 1; }\
-                    span.add-to-blacklist:hover span.blacklist-tooltip { color:#fff; display:inline; } #carousel {'+(BC.settings.hidecarousel ? "display:none" : "width: 100%; min-height: 210px" )+';}';
+                    .nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {border: 1px solid #f37835; border-radius:5px;}svg.smarty-donate:hover {-webkit-transform:rotate(14deg);transform:rotate(14deg);color:#30a247;}\
+                    #loader-container {opacity: 0.5;} span.add-to-blacklist { position: absolute; top: 4px; left: 4px; z-index: 50; width:30px; height:30px; } a.side-toggle {cursor: pointer; } svg.smarty-donate {float:right;cursor: pointer; color:#209227;}\
+                    svg.smarty-donate {-webkit-transition: transform 0.25s ease-in, color 0.25s; -moz-transition: transform 0.25s ease-in, color 0.25s; -o-transition: transform 0.25s ease-in, color 0.25s; transition: transform 0.25s ease-in, color 0.25s;}\
+                    span.blacklist-tooltip { position: absolute; font-size: 14px;width: 60px; height: 22px; left: 2px; top: 38px; line-height: 1.6; background-color: #000 ;display:none;}\
+                    span.add-to-blacklist svg {cursor: pointer;} html.noblacklist span.add-to-blacklist {display:none;} #channel-list div.item div.channel-card:hover .add-to-blacklist {opacity: 1;}\
+                    span.add-to-blacklist:hover span.blacklist-tooltip { color:#fff; display:inline; } #carousel {'+(BC.settings.hidecarousel ? "display:none" : "width: 100%; min-height: 210px" )+';}\
+                    #carousel .hidden-md > div .channel-card:hover .action-button {opacity:1;} .channel-banner .name a.userisblacklisted {text-decoration: line-through red;}';
             if (BC.settings.hidemenubar) {
                 style.innerText += '\
-                    #nav-top-menu {position: static; width: 100%; height: 60px;} #nav-menu-buffer {height: 0px; padding-top: 0px !important;; }\
+                    #nav-top-menu {position: static; width: 100%; height: 60px;} #nav-menu-buffer {height: 0px; padding-top: 0px !important;}\
                     html.topNavfloat #nav-top-menu, html.tabNavfloat .tab-scroll-outer {-webkit-transition: top 0.5s ease-in-out; -moz-transition: top 0.5s ease-in-out; -o-transition: top 0.5s ease-in-out; transition: top 0.5s ease-in-out;}\
-                    html.topNavfloat #nav-top-menu {position: fixed; /*background: #211f22 !important;*/ } html.tabNavfloat .tab-scroll-outer {position: fixed; width: 100%; z-index:989; background: #fff; }\
-                    html.tabNavfloat.night .tab-scroll-outer {background: #211f22; }\
-                    html.topNavfloat #nav-menu {padding-top: 60px; } html.tabNavfloat #page-detail .tab-content {margin-top: 50px; } html.tabNavfloat #page-detail #listing-trending {margin-top: -50px; } html.tabNavfloat #nav-side-menu {z-index:999; }';
+                    html.topNavfloat #nav-top-menu {position: fixed;} html.tabNavfloat .tab-scroll-outer {position: fixed; width: 100%; z-index:989; background: #fff;}\
+                    html.tabNavfloat.night .tab-scroll-outer {background: #211f22;}\
+                    html.topNavfloat #nav-menu {padding-top: 60px;} html.tabNavfloat #page-detail .tab-content {margin-top: 50px;} html.tabNavfloat #page-detail #listing-trending {margin-top: -50px;} html.tabNavfloat #nav-side-menu {z-index:999;}';
             }
             if (BC.settings.playlists) {
                 style.innerText += '\
@@ -125,9 +129,11 @@ var hide_Donation_Bar = true;
             }
             if (BC.settings.hideadverts) style.innerText += '.sidebar .rcad-container {display:none !important;}';
             if (hide_Donation_Bar) style.innerText += '.video-container .text-center {display: none !important;}';
-            if (hide_Cookie_Notice) style.innerText += '#alert-cookie {display: none !important; }';
+            if (hide_Cookie_Notice) style.innerText += '#alert-cookie {display: none !important;}';
+            if (use_Square_Icons) style.innerText += '.channel-banner .image-container {border-radius:0px !important;}';
             d.documentElement.appendChild(style);
             if (BC.settings.hidemenubar) window.addEventListener('scroll', floatHeaders);
+            addBrowserSearch();
             BC.loaded = 1;
         }
 
@@ -222,6 +228,7 @@ var hide_Donation_Bar = true;
             if (BC.settings.hidecomments) setTimeout(hideComments, 2000);
             addMoreRecentVideos(8);
             if (BC.settings.playlists) addMostViewedPlaylist();
+            setChannelFeed('add');
         }
         else if (BC.channelpage) {
             BC.page = 'channelpage';
@@ -229,8 +236,9 @@ var hide_Donation_Bar = true;
                 d.cookie = "sensitivity=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
             }
             let sensitivityWarning;
-            if (sensitivityWarning = qs('.sensitivity-warning a'))
-                sensitivityWarning.addEventListener('click', addSensitivityCookie, false);
+            if (sensitivityWarning = qs('.sensitivity-warning a')) sensitivityWarning.addEventListener('click', addSensitivityCookie, false);
+            if (BC.settings.useblacklist) applyChannelBlacklist();
+            setChannelFeed('add');
         }
         else if (BC.homepage || BC.categorypage) {
             BC.page = 'homepage';
@@ -276,12 +284,13 @@ var hide_Donation_Bar = true;
                 listingsPopHeight = Math.round(listingsPopular.getBoundingClientRect().height);
 
                 if (!BC.settings.hidecarousel)
-                    applyBlacklist('#channel-list div.item > div');
+                    applyBlacklist('#carousel #channel-list div.item > div,#carousel .hidden-md > div');
             }
             if (BC.settings.hidecarousel) { // The only way to pause this thing
                 if (qs('#carousel')) qs('#carousel').innerHTML = '';
             }
             applyBlacklist('#listing-all > div.row > div');
+            setChannelFeed('remove');
         }
         createSmartyButton();
         navsIni(BC.page);
@@ -297,26 +306,55 @@ var hide_Donation_Bar = true;
         if (listings.length) {
             try {
                 for (i = 0; i < listings.length; i++) {
-                    let href = listings[i].querySelector('.video-card-channel a, .video-trending-channel a, .channel-card a');
-                    if (href) {
-                        href = href.getAttribute("href");
+                    let card = listings[i].querySelector('.video-card-channel a, .video-trending-channel a, .channel-card a');
+                    if (card) {
+                        let href = card.getAttribute("href");
                         let channel = href.match( /\/channel\/([a-z0-9_\-]+)\//i );
-                        if (channel != null && channel[1] != null) {
-                            if (BC.blacklist.includes(channel[1])) {
+                        if (channel) {
+                            if (BC.blacklist.find( id => id[0] == channel[1] )) {
                                 listings[i].outerHTML = ''
                             }
                             else {
                                 listings[i].setAttribute('polled', channel[1]);
                                 let button = blacklistButton();
                                 let videoCard = listings[i].querySelector('.video-card, .video-trending-image, .channel-card');
+                                let name = listings[i].querySelector('.channel-card-title');
+                                name = name ? name.innerText : card.innerText;
                                 videoCard.appendChild(button);
-                                button.addEventListener('click', function(e){ blacklistAdd(e, channel[1]) }, true);
+                                button.addEventListener('click', function(e){ blacklistAdd(e, channel[1], name) }, true);
                             }
                         }
                     }
                 }
-            }
-            catch (e) {console.error(e)}
+            } catch (e) {console.error('applyBlacklist: '+ e)}
+        }
+    }
+
+    function applyChannelBlacklist() {
+        let card = qs('.channel-banner .name a');
+        let name = card.innerText;
+        if (card) {
+            try {
+                let href = card.getAttribute("href");
+                let channel = href.match( /\/channel\/([a-z0-9_\-]+)\//i );
+                if (channel) {
+                    if (BC.blacklist.find( id => id[0] == channel[1] )) {
+                        card.setAttribute('title', name +' is blacklisted ☺');
+                        card.classList.add('userisblacklisted')
+                    }
+                    else {
+                        let button = blacklistButton();
+                        card.parentNode.appendChild(button);
+                        button.addEventListener('click', function(e){
+                            blacklistAdd(e, channel[1], name);
+                            this.previousSibling.classList.add('userisblacklisted');
+                            this.previousSibling.setAttribute('title', name +' is blacklisted ☺');
+                            this.style.display = 'none';
+                        }, true);
+                        button.style = 'position: relative;left: 10px;opacity: 1;';
+                    }
+                }
+            } catch (e) {console.error('applyChannelBlacklist: '+ e)}
         }
     }
 
@@ -324,8 +362,8 @@ var hide_Donation_Bar = true;
         let i;
         let blacklisted;
         let blContent = '';
-        let donate = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"><svg class="smarty-donate" version="1.0" xmlns="http://www.w3.org/2000/svg" width="14pt" height="14pt" viewBox="0 0 496 512" preserveAspectRatio="xMidYMid meet"><g transform="translate(248 256)"><g transform="translate(0, 0)  scale(1, 1)  rotate(-7 7 7)">'+
-            '<path fill="#30a247" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm24 376v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16.2c-16.5-.6-32.6-5.8-46.4-15.1-8.7-5.9-10-18.1-2.3-25.2l12-11.3c5.4-5.1 13.3-5.4 19.7-1.6 6.1 3.6 12.9 5.4 19.9 5.4h45c11.3 0 20.5-10.5 20.5-23.4 0-10.6-6.3-19.9-15.2-22.7L205 268c-29-8.8-49.2-37-49.2-68.6 0-39.3 30.6-71.3 68.2-71.4v-16c0-8.8 '+
+        let donate = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"><svg class="smarty-donate" version="1.0" xmlns="http://www.w3.org/2000/svg" width="14pt" height="14pt" viewBox="0 0 496 512" preserveAspectRatio="xMidYMid meet"><g transform="translate(248 256)"><g transform="translate(0, 0)  scale(1, 1)  rotate(-14 7 7)">'+
+            '<path fill="currentColor" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm24 376v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16.2c-16.5-.6-32.6-5.8-46.4-15.1-8.7-5.9-10-18.1-2.3-25.2l12-11.3c5.4-5.1 13.3-5.4 19.7-1.6 6.1 3.6 12.9 5.4 19.9 5.4h45c11.3 0 20.5-10.5 20.5-23.4 0-10.6-6.3-19.9-15.2-22.7L205 268c-29-8.8-49.2-37-49.2-68.6 0-39.3 30.6-71.3 68.2-71.4v-16c0-8.8 '+
             '7.2-16 16-16h16c8.8 0 16 7.2 16 16v16.2c16.5.6 32.6 5.8 46.4 15.1 8.7 5.9 10 18.1 2.3 25.2l-12 11.3c-5.4 5.1-13.3 5.4-19.7 1.6-6.1-3.6-12.9-5.4-19.9-5.4h-45c-11.3 0-20.5 10.5-20.5 23.4 0 10.6 6.3 19.9 15.2 22.7l72 21.9c29 8.8 49.2 37 49.2 68.6.2 39.3-30.4 71.2-68 71.4z" transform="translate(-248 -256)"></path></g></g><title>Donate to Smarty</title></svg>';
         let tabContent = '<a href="javascript:void(0)">Smarty</a><div id="smarty_tab" class="modal-content" style="display: none; position: absolute; z-index: 200;">'+
               '<div style="width: 170px; padding: 8px; border: 1px solid #333; border-radius:3px;">'+
@@ -354,7 +392,7 @@ var hide_Donation_Bar = true;
                 if (BC.blacklist.length ) {
                     for (i = 0; i < BC.blacklist.length; i++) {
                         blContent += '<span style="cursor:pointer" title="Click to remove '+
-                          BC.blacklist[i] +'">'+ (blacklistName(BC.blacklist[i])) +'</span><br>';
+                          BC.blacklist[i][1] +'" data-name="'+BC.blacklist[i][0]+'">'+ (blacklistName(BC.blacklist[i][1])) +'</span><br>';
                     }
                 }
                 else blContent = '<div><em>No Blacklist</em></div>';
@@ -382,7 +420,7 @@ var hide_Donation_Bar = true;
                 if (BC.blacklist.length ) {
                     for (i = 0; i < BC.blacklist.length; i++) {
                         blContent += '<span style="cursor:pointer" title="Click to remove '+
-                          BC.blacklist[i] +'">'+ (blacklistName(BC.blacklist[i])) +'</span><br>';
+                          BC.blacklist[i][1] +'" data-name="'+BC.blacklist[i][0]+'">'+ (blacklistName(BC.blacklist[i][1])) +'</span><br>';
                     }
                 }
                 else blContent = '<div><em>No Blacklist</em></div>';
@@ -437,14 +475,16 @@ var hide_Donation_Bar = true;
         }
     }
 
-    function blacklistAdd(e, channel) {
-        var i;
-        BC.blacklist.push(channel);
+    function blacklistAdd(e, channel, name) {
+        let i;
+        let blocked = qsa('[polled="'+channel+'"]');
+        
+        for (i = 0; i < blocked.length; i++) blocked[i].innerHTML = wait(blocked[i]);
+        BC.blacklist.push([channel, name]);
         BC.blacklist.sort();
         GM.setValue('blacklist', JSON.stringify(BC.blacklist));
         createSmartyButton();
-        let blocked = qsa('[polled="'+channel+'"]');
-        for (i = 0; i < blocked.length; i++) blocked[i].innerHTML = wait(blocked[i]);
+
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -453,7 +493,7 @@ var hide_Donation_Bar = true;
     function blacklistRemove(e) {
         toggleTab();
         let arr = BC.blacklist.filter(function(ele){
-            return ele != e.target.innerText;
+            return ele[0] != e.target.getAttribute('data-name');
         });
         BC.blacklist = arr;
         BC.blacklist.sort();
@@ -572,7 +612,7 @@ var hide_Donation_Bar = true;
                     if (BC.previouslisting) {
                         let previouslisting = BC.previouslisting;
                         if (previouslisting.indexOf('listing') !=-1 && !BC.settings.hidecarousel)
-                            applyBlacklist('#channel-list div.item > div');
+                            applyBlacklist('#carousel #channel-list div.item > div,#carousel .hidden-md > div');
                         applyBlacklist(previouslisting);
                     }
                     d.documentElement.classList.remove("noblacklist");
@@ -585,7 +625,7 @@ var hide_Donation_Bar = true;
             if (carousel = qs('#carousel')) {
                 carousel.style.display = (val ? 'none' : 'block');
                 if (val) carousel.innerHTML = '';
-                else carousel.innerHTML = '<h2>Refresh window to start carousel</h2>';
+                else carousel.innerHTML = '<h3>Refresh window to start carousel</h3>';
             }
             savePlayerValue(arg, val);
             createSmartyButton();
@@ -609,7 +649,7 @@ var hide_Donation_Bar = true;
         }
         else if (arg == 'color') {
             savePlayerValue(arg, val);
-            window.location.href = window.location.href;
+            window.location.replace(window.location.href);
         }
     }
 
@@ -755,6 +795,43 @@ var hide_Donation_Bar = true;
         return false;
     }
 
+    function addBrowserSearch() {
+      	let head = qs('head');
+      	let openSearch = d.createElement('link');
+
+      	openSearch.setAttribute('rel', 'search');
+      	openSearch.setAttribute('href', location.protocol +'//github.com/s-marty/SmartChute/raw/master/inc/search.xml');
+      	openSearch.setAttribute('type', 'application/opensearchdescription+xml');
+      	openSearch.setAttribute('title', 'Bit Chute');
+      	head.appendChild(openSearch);
+    }
+
+    function setChannelFeed(action) {
+        let head = qs('head');
+        let card = qs('.channel-banner .name a');
+        let feed = qs('#rss_feed');
+        
+        if (action == 'remove' && feed) {
+            head.removeChild(feed)
+        }
+        else if (action == 'add' && card) {
+            let href = card.getAttribute("href");
+            let channel = href.match( /\/channel\/([a-z0-9_\-]+)\//i );
+            if (channel) {
+      	        if (feed && feed.title != channel[1]) head.removeChild(feed);
+      	        else if (!feed) {
+          	        let rssLink = d.createElement('link');
+                    rssLink.setAttribute('rel', 'alternate');
+                    rssLink.setAttribute('href', location.protocol +'//www.bitchute.com/feeds/rss/channel/' + channel[1] + '/');
+                    rssLink.setAttribute('type', 'application/rss+xml');
+                    rssLink.setAttribute('title', channel[1]);
+                    rssLink.setAttribute('id', 'rss_feed');
+                    head.appendChild(rssLink);
+                }
+            }
+        }
+    }
+
     function setPreferencesCookie(name, value) {
         let val, preferences = d.cookie.match(/preferences=(\{[a-z0-9_%:\-]+[^;]*\})/i);
         if (preferences) {
@@ -795,23 +872,26 @@ var hide_Donation_Bar = true;
         if (!isTheme && BC.settings.color != 'none') {
             isTheme = true;
             let colours = {
-                'orange':{light:'#ef4136',lighter:'#f37835',lightest:'#f0af5a'},
-                 'green':{light:'#46a604',lighter:'#35c453',lightest:'#55a47c'},
-                  'blue':{light:'#2532e0',lighter:'#2567e0',lightest:'#559bcc'}
+                'orange':{dark:'#ef4136',lighter:'#f37835',lightest:'#f0af5a'},
+                 'green':{dark:'#46a604',lighter:'#35c453',lightest:'#55a47c'},
+                  'blue':{dark:'#2532e0',lighter:'#2567e0',lightest:'#559bcc'}
             };
             let style = d.createElement("style");
             style.type = "text/css";
             style.innerText = '\
-                .night .sidebar-heading, .night .subscribe-button, .night .btn-danger, .night #loader ul li {background-color: '+colours[BC.settings.color].light+';}\
-                .night a:hover, .night .scripted-link:hover {color: '+colours[BC.settings.color].light+' !important;} .night .nav-tabs>li.active {border-bottom-color:'+colours[BC.settings.color].light+';}\
+                .night .sidebar-heading, .night .subscribe-button, .night .btn-danger, .night #loader ul li {background-color: '+colours[BC.settings.color].dark+';}\
+                .night .sidebar-recent .video-card.active {border: 1px solid '+colours[BC.settings.color].lighter+';} .night .nav-tabs>li.active {border-bottom-color:'+colours[BC.settings.color].dark+';}\
                 .night body, .night .video-card .video-card-text, .night .video-card .video-card-text p i, .night .notify-button, \
                 .night .channel-notify-button, .night .channel-videos-details, .night .channel-videos-title a, .night .channel-videos-text, \
                 .night .video-trending-details, .night .video-trending-title a, .night .video-trending-channel a, .night .video-trending-text, \
                 .night .playlist-video .details, .night .playlist-video .title a, .night .playlist-video .channel a, .night .playlist-video .description, \
-                .night .video-detail-text p, .night .video-information .sharing-drop span, .night .search-box .form-control { color: '+colours[BC.settings.color].lightest+'; }\
-                .night a:link, .night a:active, .night a:visited, .night a:focus, .night .scripted-link, .night #nav-top-menu .unauth-link a, \
-                .night .video-card .video-card-text a, .night #nav-top-menu .user-link a, #day-theme a svg { color: '+colours[BC.settings.color].lighter+'; }\
-                .night .tags ul li a, .night #show-comments {background-color: #3b383c; border-radius:5px;} .night .tags ul li a:hover {background-color: #4d484e;} .creator-monetization {color: #30a247;}';
+                .night .video-detail-text p, .night .video-information .sharing-drop span, .night #nav-top-menu .search-box .form-control { color: '+colours[BC.settings.color].lightest+';}\
+                .night a:link, .night a:active, .night a:visited, .night a:focus, .night .scripted-link, .night #nav-top-menu .unauth-link a, .night #nav-side-menu .side-toggle,\
+                .night .video-card .video-card-text a, .night #nav-top-menu .user-link a, .night #day-theme a svg, .night .search-icon svg { color: '+colours[BC.settings.color].lighter+';}\
+                .night #nav-side-menu .side-toggle:hover, .night #day-theme a svg:hover, .night .search-icon svg:hover, \
+                .night a:hover, .night .scripted-link:hover {color: '+colours[BC.settings.color].dark+' !important;}\
+                .night .tags ul li a, .night #show-comments {background-color: #3b383c; border-radius:5px;} .night .tags ul li a:hover {background-color: #4d484e;} .creator-monetization {color: #30a247;}\
+                .night .channel-banner .name a.userisblacklisted {text-decoration-color: yellow;}';
             d.documentElement.appendChild(style);
         }
     }
@@ -1039,7 +1119,7 @@ var hide_Donation_Bar = true;
     function addListener(target, fn, config) {
         var cfg = {...{attributes:!1, childList:!1, characterData:!1, subtree:!1}, ...config};
         var observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {  fn(mutation)  })});
+          mutations.forEach(function(mutation) { fn(mutation) })});
         observer.observe(target, cfg);
         return observer
     }
@@ -1050,21 +1130,15 @@ var hide_Donation_Bar = true;
         GM.getValue('player', "{}").then(function (value) {
             if (value && value != '{}') {
                 let player = {...settings, ...JSON.parse(value)};
-                BC.loaded = !1;
-                BC.api = null;
-                BC.fur = null;
                 BC.url = null;
                 BC.host = null;
                 BC.path = null;
-                BC.cookies = null;
-                BC.homepage = false;
-                BC.watchpage = false;
-                BC.channelpage = false;
+                BC.loaded = !1;
+                BC.blacklist = [];
+                BC.page = 'homepage';
+                BC.previouslisting = '';
                 BC.listenersIni = false;
                 BC.miniPlayerIni = false;
-                BC.previouslisting = '';
-                BC.page = 'homepage';
-                BC.blacklist = [];
                 BC.player = {
                     api     : null,
                     fur     : null,
@@ -1077,11 +1151,11 @@ var hide_Donation_Bar = true;
                     usedark      : player.usedark,
                     playnext     : player.playnext,
                     playlists    : player.playlists,
+                    hideadverts  : player.hideadverts,
+                    hidemenubar  : player.hidemenubar,
                     useblacklist : player.useblacklist,
                     hidecarousel : player.hidecarousel,
-                    hidecomments : player.hidecomments,
-                    hidemenubar  : player.hidemenubar,
-                    hideadverts  : player.hideadverts
+                    hidecomments : player.hidecomments
                 }
                 GM.getValue('blacklist', "[]").then(function (value) {
                     BC.blacklist = JSON.parse(value);
@@ -1092,10 +1166,10 @@ var hide_Donation_Bar = true;
             }
             else {
                     /* Install Database */
-                GM.setValue('miniplayer', JSON.stringify({ x:0,y:0,w:350,h:197 }));
-                GM.setValue('player', settings);
                 GM.setValue('blacklist', '[]');
-                window.location.href = window.location.href;
+                GM.setValue('player', settings);
+                GM.setValue('miniplayer', JSON.stringify({ x:0,y:0,w:350,h:197 }));
+                window.location.replace(window.location.href);
             }
         }).catch (error => {
             console.error('S_marty: Error in promise loading dB: '+ error)
