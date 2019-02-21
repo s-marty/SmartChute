@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>BitChute</ShortName>
+  <Description>Search Bitchute</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/x-icon">https://www.bitchute.com/static/v82/images/favicon-16x16.png</Image>
+  <Url type="text/html" method="get" template="https://www.bitchute.com/search?q={searchTerms}&amp;sort=date_created+desc"></Url>
+</OpenSearchDescription>
