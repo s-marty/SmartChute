@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         19.2.19
+// @version         19.3.11
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -48,9 +48,10 @@
 ***  ***  Does not & will not work well with IE and IEdge  ***/
 
 /* Editable options */
-var hide_Cookie_Notice = false;
-var hide_Donation_Bar = false;
-var use_Square_Icons = false;
+var use_Square_Icons = true;
+var hide_Donation_Bar = true;
+var hide_Cookie_Notice = true;
+var hide_Signup_Notice = true;
 /* End Editable options */
 
 (function() {
@@ -105,10 +106,11 @@ var use_Square_Icons = false;
                     .nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {border: 1px solid #f37835; border-radius:5px;}svg.smarty-donate:hover {-webkit-transform:rotate(14deg);transform:rotate(14deg);color:#30a247;}\
                     #loader-container {opacity: 0.5;} span.add-to-blacklist { position: absolute; top: 4px; left: 4px; z-index: 50; width:30px; height:30px; } a.side-toggle {cursor: pointer; } svg.smarty-donate {float:right;cursor: pointer; color:#209227;}\
                     svg.smarty-donate {-webkit-transition: transform 0.25s ease-in, color 0.25s; -moz-transition: transform 0.25s ease-in, color 0.25s; -o-transition: transform 0.25s ease-in, color 0.25s; transition: transform 0.25s ease-in, color 0.25s;}\
-                    span.blacklist-tooltip { position: absolute; font-size: 14px;width: 60px; height: 22px; left: 2px; top: 38px; line-height: 1.6; background-color: #000 ;display:none;}\
+                    span.blacklist-tooltip { position: absolute; font-size: 14px;padding: 0 4px; height: 22px; left: 2px; top: 38px; line-height: 1.6; background-color: #000 ;display:none;} #smarty_tab label:hover, #smarty_tab #blacklistedchannels span:hover {color:#ef4136;}\
                     span.add-to-blacklist svg {cursor: pointer;} html.noblacklist span.add-to-blacklist {display:none;} #channel-list div.item div.channel-card:hover .add-to-blacklist {opacity: 1;}\
                     span.add-to-blacklist:hover span.blacklist-tooltip { color:#fff; display:inline; } #carousel {'+(BC.settings.hidecarousel ? "display:none" : "width: 100%; min-height: 210px" )+';}\
-                    #carousel .hidden-md > div .channel-card:hover .action-button {opacity:1;} .channel-banner .name a.userisblacklisted {text-decoration: line-through red;}';
+                    #carousel .hidden-md > div .channel-card:hover .action-button {opacity:1;} .channel-banner .name a.userisblacklisted {text-decoration: line-through red;}\
+                    .channel-banner .name .add-to-blacklist {position: relative;left: 10px;} .channel-banner .name:hover .add-to-blacklist {opacity: 1;}';
             if (BC.settings.hidemenubar) {
                 style.innerText += '\
                     #nav-top-menu {position: static; width: 100%; height: 60px;} #nav-menu-buffer {height: 0px; padding-top: 0px !important;}\
@@ -130,6 +132,7 @@ var use_Square_Icons = false;
             if (BC.settings.hideadverts) style.innerText += '.sidebar .rcad-container {display:none !important;}';
             if (hide_Donation_Bar) style.innerText += '.video-container .text-center {display: none !important;}';
             if (hide_Cookie_Notice) style.innerText += '#alert-cookie {display: none !important;}';
+            if (hide_Signup_Notice) style.innerText += '#alert-signup {display: none !important;}';
             if (use_Square_Icons) style.innerText += '.channel-banner .image-container {border-radius:0px !important;}';
             d.documentElement.appendChild(style);
             if (BC.settings.hidemenubar) window.addEventListener('scroll', floatHeaders);
@@ -169,7 +172,8 @@ var use_Square_Icons = false;
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar {display : block;cursor: move; height: 40px; left: -3px; right: 5px; top: -6px; position: absolute;z-index: 110;background-color:transparent;}\
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar:hover {background-color:#000; opacity: 0.4; background-clip: padding-box; padding: 6px 0 0 6px;}\
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-size {display : block;cursor: nesw-resize; width:7px; height: 7px; right: -3px; top: -3px; position: absolute;z-index: 120;background-color:transparent;}\
-                                html:not(.s-marty-miniplayer) #s-marty-miniplayer-bar, html:not(.s-marty-miniplayer) #s-marty-miniplayer-size {display : none;} html:not(.isfullscreen).s-marty-miniplayer .plyr__volume {max-width:12% !important;}\
+                                html:not(.isfullscreen).s-marty-miniplayer .plyr__controls button[data-plyr="captions"], html:not(.isfullscreen).s-marty-miniplayer .plyr__controls button[data-plyr="pip"], html:not(.isfullscreen).s-marty-miniplayer .plyr__controls .plyr__menu {display : none !important;}\
+                                html:not(.s-marty-miniplayer) #s-marty-miniplayer-bar, html:not(.s-marty-miniplayer) #s-marty-miniplayer-size {display : none;} html:not(.isfullscreen).s-marty-miniplayer .plyr__volume {/*max-width:12% !important; */width: 12% !important;}\
                                 html.isfullscreen video#player {width: 100% !important; height: !important;}';
                             d.documentElement.appendChild(style);
                             BC.miniPlayerIni = true;
@@ -228,6 +232,7 @@ var use_Square_Icons = false;
             if (BC.settings.hidecomments) setTimeout(hideComments, 2000);
             addMoreRecentVideos(8);
             if (BC.settings.playlists) addMostViewedPlaylist();
+            if (BC.settings.useblacklist) applyChannelBlacklist();
             setChannelFeed('add');
         }
         else if (BC.channelpage) {
@@ -351,7 +356,6 @@ var use_Square_Icons = false;
                             this.previousSibling.setAttribute('title', name +' is blacklisted ☺');
                             this.style.display = 'none';
                         }, true);
-                        button.style = 'position: relative;left: 10px;opacity: 1;';
                     }
                 }
             } catch (e) {console.error('applyChannelBlacklist: '+ e)}
@@ -452,7 +456,7 @@ var use_Square_Icons = false;
         span.innerHTML = '<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 33 33" preserveAspectRatio="xMidYMid meet"><g transform="translate(0.000000,27.000000) ' +
             'scale(0.100000,-0.100000)" stroke="none"><path fill="currentColor" d="M12 258 c-17 -17 -17 -229 0 -246 17 -17 229 -17 246 0 17 17 17 229 0 246 -17 17 -229 17 -246 0z m233 -123 l0 -110 -110 0 -110 0 -3 99 c-1 55 0 106 2 113 4 11 30 13 113 11 l108 -3 0 -110z"/>' +
             '<path fill="currentColor" d="M40 217 c0 -7 16 -26 35 -42 19 -17 35 -35 35 -40 0 -6 -16 -25 -35 -42 -19 -18 -35 -37 -35 -43 0 -22 31 -8 60 29 l32 39 35 -39 c34 -37 63 -51 63 -29 0 6 -16 24 -35 41 -19 17 -35 37 -35 44 0 7 16 25 35 39 35 27 47 56 ' +
-            '23 56 -7 0 -26 -16 -41 -35 -15 -19 -33 -35 -40 -35 -7 0 -25 16 -41 35 -30 35 -56 46 -56 22z"/></g></svg><span class="blacklist-tooltip">&nbsp;Blacklist</span>';
+            '23 56 -7 0 -26 -16 -41 -35 -15 -19 -33 -35 -40 -35 -7 0 -25 16 -41 35 -30 35 -56 46 -56 22z"/></g></svg><span class="blacklist-tooltip">&nbsp;Blacklist&nbsp;</span>';
         return span
     }
 
@@ -885,10 +889,11 @@ var use_Square_Icons = false;
                 .night .channel-notify-button, .night .channel-videos-details, .night .channel-videos-title a, .night .channel-videos-text, \
                 .night .video-trending-details, .night .video-trending-title a, .night .video-trending-channel a, .night .video-trending-text, \
                 .night .playlist-video .details, .night .playlist-video .title a, .night .playlist-video .channel a, .night .playlist-video .description, \
+                .night #smarty_tab label, .night #smarty_tab #blacklistedchannels span, \
                 .night .video-detail-text p, .night .video-information .sharing-drop span, .night #nav-top-menu .search-box .form-control { color: '+colours[BC.settings.color].lightest+';}\
                 .night a:link, .night a:active, .night a:visited, .night a:focus, .night .scripted-link, .night #nav-top-menu .unauth-link a, .night #nav-side-menu .side-toggle,\
                 .night .video-card .video-card-text a, .night #nav-top-menu .user-link a, .night #day-theme a svg, .night .search-icon svg { color: '+colours[BC.settings.color].lighter+';}\
-                .night #nav-side-menu .side-toggle:hover, .night #day-theme a svg:hover, .night .search-icon svg:hover, \
+                .night #nav-side-menu .side-toggle:hover, .night #day-theme a svg:hover, .night .search-icon svg:hover, .night #smarty_tab label:hover, .night #smarty_tab #blacklistedchannels span:hover, \
                 .night a:hover, .night .scripted-link:hover {color: '+colours[BC.settings.color].dark+' !important;}\
                 .night .tags ul li a, .night #show-comments {background-color: #3b383c; border-radius:5px;} .night .tags ul li a:hover {background-color: #4d484e;} .creator-monetization {color: #30a247;}\
                 .night .channel-banner .name a.userisblacklisted {text-decoration-color: yellow;}';
