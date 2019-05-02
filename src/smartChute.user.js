@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         19.3.11
+// @version         19.5.2
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -33,12 +33,13 @@
 *** Hide or unhide comments section - make up your own mind  or not
 *** Scrolls down to video player automatically if header is unfixed
 *** Autoplay videos or not is now selectable
-*** Video volume is remembered - No More 100% volume the first play
-*** Theme night/day is remembered when clicking the sun/moon icon
+*** Video volume is persisted - No More 100% volume the first play
+*** Theme night/day is persisted when clicking the sun/moon icon
 *** Three additional night themes for your tired eyes
-*** Play Next is remembered when clicking the "PLAYING NEXT" button
-*** Remembering lasts across browser instantiations too
-*** Top ten most viewed channel video playlist on video page
+*** Play Next persists when clicking the "PLAYING NEXT" button
+*** Persistence lasts across browser instantiations too
+*** Top ten most viewed channel video playlist on video page option
+*** Channel owner-created playlists displayed on video page option
 *** 32 More video choices on Video watch page vs. 6
 *** Unlimited video choices using "SHOW MORE" button, vs. 6
 *** OpenSearch browser search to search from address or search bar
@@ -63,6 +64,7 @@ var hide_Signup_Notice = true;
     var miniPlayerY = 0;
     var miniPlayerW = 0;
     var miniPlayerH = 0;
+    var previousOpacity = 0;
     var listingsAllHeight = 0;
     var listingsPopHeight = 0;
     var miniSiz = {h:0,hd:0};
@@ -76,34 +78,42 @@ var hide_Signup_Notice = true;
         BC.url          = window.location.href;
         BC.host         = window.location.hostname;
         BC.path         = window.location.pathname;
+        BC.playlist     = BC.url.indexOf('list=') !=-1;
         BC.watchpage    = BC.path.indexOf('/video') !=-1;
         BC.searchpage   = BC.path.indexOf('/search/') !=-1;
         BC.profilepage  = BC.path.indexOf('/profile/') !=-1;
         BC.channelpage  = BC.path.indexOf('/channel/') !=-1;
         BC.categorypage = BC.path.indexOf('/category/') !=-1;
+        BC.playlistpage = BC.path.indexOf('/playlist/') !=-1;
         BC.homepage     = BC.url == location.protocol +"//"+ BC.host +"/";
 
         if (!BC.loaded) {
-            var loader;
-            if (loader = qs("#loader-container")) {
-                addListener(loader, function(e) {
-                    if (e.target.style.opacity == 0.5 && e.target.style.display == 'block') chuteMePlease(e)
-                },{ attributes : true, attributeFilter : ['style'] });
+            if (!BC.loader) {
+                if (BC.loader = qs("#loader-container")) {
+                    addListener(BC.loader, function(e) {
+                        if (e.target.style.opacity == 0.5 && previousOpacity != 0.5 && e.target.style.display == 'block') chuteMePlease(e)
+                        previousOpacity = e.target.style.opacity
+                    },{ attributes : true, attributeFilter : ['style'] });
+                }
             }
-            if (! (BC.homepage || BC.watchpage || BC.channelpage || BC.categorypage || BC.profilepage || BC.searchpage)) return;
-            setTimeout(addThemeListeners, 2000);
-            if (isChrome && BC.settings.hidemenubar) {
-                window.addEventListener('beforeunload', function(e){
-                  if (!document.activeElement.href){window.scrollTo(0, 0)}
-                }, false);
+            if (! (BC.homepage || BC.watchpage || BC.channelpage || BC.categorypage || BC.profilepage || BC.searchpage || BC.playlistpage)) return;
+            if (!BC.themes) {
+                setTimeout(addThemeListeners, 2000);
+                if (isChrome && BC.settings.hidemenubar) {
+                    window.addEventListener('beforeunload', function(e){
+                      if (!document.activeElement.href){window.scrollTo(0, 0)}
+                    }, false);
+                }
+                setTheme();
+                setPreferencesCookie("autoplay", BC.settings.playnext);
+                BC.themes = true;
             }
-            setTheme();
-            setPreferencesCookie("autoplay", BC.settings.playnext);
-            if (BC.searchpage || BC.profilepage) return;
+            if (BC.searchpage || BC.profilepage || BC.playlistpage) return;
             let style = d.createElement("style");
             style.type = "text/css";
             style.innerText = '\
                     .nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {border: 1px solid #f37835; border-radius:5px;}svg.smarty-donate:hover {-webkit-transform:rotate(14deg);transform:rotate(14deg);color:#30a247;}\
+                    .playlist-card.active {border: 1px solid #f37835; border-radius:5px;}\
                     #loader-container {opacity: 0.5;} span.add-to-blacklist { position: absolute; top: 4px; left: 4px; z-index: 50; width:30px; height:30px; } a.side-toggle {cursor: pointer; } svg.smarty-donate {float:right;cursor: pointer; color:#209227;}\
                     svg.smarty-donate {-webkit-transition: transform 0.25s ease-in, color 0.25s; -moz-transition: transform 0.25s ease-in, color 0.25s; -o-transition: transform 0.25s ease-in, color 0.25s; transition: transform 0.25s ease-in, color 0.25s;}\
                     span.blacklist-tooltip { position: absolute; font-size: 14px;padding: 0 4px; height: 22px; left: 2px; top: 38px; line-height: 1.6; background-color: #000 ;display:none;} #smarty_tab label:hover, #smarty_tab #blacklistedchannels span:hover {color:#ef4136;}\
@@ -119,17 +129,19 @@ var hide_Signup_Notice = true;
                     html.tabNavfloat.night .tab-scroll-outer {background: #211f22;}\
                     html.topNavfloat #nav-menu {padding-top: 60px;} html.tabNavfloat #page-detail .tab-content {margin-top: 50px;} html.tabNavfloat #page-detail #listing-trending {margin-top: -50px;} html.tabNavfloat #nav-side-menu {z-index:999;}';
             }
-            if (BC.settings.playlists) {
+            if (BC.settings.playlists || BC.settings.mvplaylist) {
                 style.innerText += '\
-                    .mvplaylist.row {margin-top:20px;margin-bottom:20px;} .mvplaylist .mvslider {width:100%;max-width: 878px; padding-left:35px;margin: auto 0px; overflow:hidden;display: inline;}\
-                    .mvplaylist .mvslider {-webkit-transition: margin-left 0.25s ease-in-out; -moz-transition: margin-left 0.25s ease-in-out; -o-transition: margin-left 0.25s ease-in-out; transition: margin-left 0.25s ease-in-out;}\
-                    .mvplaylist .playlistup {margin-left:693px;} .mvplaylist .playlistbtn {cursor:pointer;width: 30px;height:195px;padding-top:85px;background-color: #ddd;text-align:center;position: absolute; z-index: 80;}\
-                    .mvplaylist .playlistbtn b {cursor:pointer;} .mvplaylist .playlistbtn.disabled {cursor:default;} .mvplaylist .playlistbtn.disabled b {color: #ddd;cursor:default;}\
-                    .mvplaylist .playlist-card {width: 208px;height:195px;margin: 0 5px;} .mvplaylist .playlist-card .video-card-title {height: 52px;} .night .mvplaylist .playlistbtn {background-color: #2c2a2d;}\
-                    .night .mvplaylist .playlistbtn.disabled b {color: #2c2a2d;} @media (min-width: 768px) {.mvplaylist .mvslider {max-width: 660px;} .mvplaylist .playlistup {margin-left:475px;}}\
-                    @media (min-width: 992px) {.mvplaylist .mvslider {max-width: 878px;} .mvplaylist .playlistup {margin-left:693px;}}';
+                    .mvplaylist.row, .playlist.row {width: 723px;margin-top:20px;margin-bottom:20px;} .plslider, .mvslider {width:100%;max-width: 878px; padding-left:35px;margin: auto 0px; overflow:hidden;display: inline;}\
+                    .mvplaylist .playlist-title, .playlist .playlist-title {display:inline-block; width: auto !important; margin: 20px 37px 10px;} #comment-frm-container {margin-top: 20px !important;}\
+                    .plslider, .mvslider {-webkit-transition: margin-left 0.25s ease-in-out; -moz-transition: margin-left 0.25s ease-in-out; -o-transition: margin-left 0.25s ease-in-out; transition: margin-left 0.25s ease-in-out;}\
+                    .playlistup {margin-left:693px;} .playlistbtn {cursor:pointer;width: 30px;height:195px;padding-top:85px;background-color: #ddd;text-align:center;position: absolute; z-index: 80;}\
+                    .playlistbtn b {cursor:pointer;} .playlistbtn.disabled {cursor:default;} .playlistbtn.disabled b {color: #ddd;cursor:default;}\
+                    .playlist-title span {margin-left:16px;} .playlist-title span:hover {color:#ffaa00;} .video-card-published.sequence {position: absolute;bottom: 0px;right: 3px; z-index:50;}\
+                    .mvplaylist .playlist-card, .playlist .playlist-card {width: 208px;height:195px;margin: 0 5px;} .playlist-card .video-card-title {height: 52px;} .night .playlistbtn {background-color: #2c2a2d;}\
+                    .night .playlistbtn.disabled b {color: #2c2a2d;} @media (min-width: 768px) {.plslider, .mvslider {max-width: 660px;} .playlistup {margin-left:475px;}.mvplaylist.row, .playlist.row {width: 505px;}}\
+                    @media (min-width: 992px) {.plslider, .mvslider {max-width: 878px;} .playlistup {margin-left:693px;}.mvplaylist.row, .playlist.row {width: 723px;}}';
             }
-            if (BC.settings.hideadverts) style.innerText += '.sidebar .rcad-container {display:none !important;}';
+            if (BC.settings.hideadverts) style.innerText += '.sidebar .rcad-container, .sidebar > div:not(.sidebar-video) {display:none !important;}';
             if (hide_Donation_Bar) style.innerText += '.video-container .text-center {display: none !important;}';
             if (hide_Cookie_Notice) style.innerText += '#alert-cookie {display: none !important;}';
             if (hide_Signup_Notice) style.innerText += '#alert-signup {display: none !important;}';
@@ -230,8 +242,15 @@ var hide_Signup_Notice = true;
                 }, false);
             }
             if (BC.settings.hidecomments) setTimeout(hideComments, 2000);
-            addMoreRecentVideos(8);
-            if (BC.settings.playlists) addMostViewedPlaylist();
+            if (BC.playlist) {
+                let playlistId = BC.url.match( /[&?]+list=([^&]*[a-z0-9_-]+)/i )[1];
+                addMoreRecentVideos(8, playlistId);
+            }
+            else {
+                addMoreRecentVideos(8);
+                if (BC.settings.mvplaylist) addMostViewedPlaylist();
+                if (BC.settings.playlists) addChannelPlaylists();
+            }
             if (BC.settings.useblacklist) applyChannelBlacklist();
             setChannelFeed('add');
         }
@@ -314,7 +333,7 @@ var hide_Signup_Notice = true;
                     let card = listings[i].querySelector('.video-card-channel a, .video-trending-channel a, .channel-card a');
                     if (card) {
                         let href = card.getAttribute("href");
-                        let channel = href.match( /\/channel\/([a-z0-9_\-]+)\//i );
+                        let channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
                         if (channel) {
                             if (BC.blacklist.find( id => id[0] == channel[1] )) {
                                 listings[i].outerHTML = ''
@@ -341,7 +360,7 @@ var hide_Signup_Notice = true;
         if (card) {
             try {
                 let href = card.getAttribute("href");
-                let channel = href.match( /\/channel\/([a-z0-9_\-]+)\//i );
+                let channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
                 if (channel) {
                     if (BC.blacklist.find( id => id[0] == channel[1] )) {
                         card.setAttribute('title', name +' is blacklisted ☺');
@@ -375,7 +394,8 @@ var hide_Signup_Notice = true;
                 '<input name="hidemenubar" id="hidemenubar2" type="checkbox"'+(BC.settings.hidemenubar ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="hidemenubar2">&nbsp;Scroll Menubar</label><br>'+
                 '<input name="hidecarousel" id="hidecarousel2" type="checkbox"'+(BC.settings.hidecarousel ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="hidecarousel2">&nbsp;Hide Carousel</label><br>'+
                 '<input name="hidecomments" id="hidecomments2" type="checkbox"'+(BC.settings.hidecomments ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="hidecomments2">&nbsp;Hide Comments</label><br>'+
-                '<input name="playlists" id="playlists2" type="checkbox"'+(BC.settings.playlists ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="playlists2">&nbsp;Show Playlist</label><br>'+
+                '<input name="mvplaylist" id="mvplaylist2" type="checkbox"'+(BC.settings.mvplaylist ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="mvplaylist2">&nbsp;Popular Playlist</label><br>'+
+                '<input name="playlists" id="playlists2" type="checkbox"'+(BC.settings.playlists ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="playlists2">&nbsp;All Playlists</label><br>'+
                 '<input name="autoplay" id="autoplay2" type="checkbox"'+(BC.player.autoplay ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="autoplay2">&nbsp;Auto Play Video</label><br>'+
                 '<input name="hideadverts" id="hideadverts2" type="checkbox"'+(BC.settings.hideadverts ? ' checked':'')+'> <label style="margin-bottom: 0px;" for="hideadverts2">&nbsp;Hide Unsafe Ads</label><br>'+
                 '<input name="color" title="Night Color: None" value="none" type="radio"'+(BC.settings.color == 'none' ? ' checked':'')+'>&nbsp;&nbsp;<span style="height:12px;width:12px;background-color:#211f22;color:#f0af5a">&nbsp;&nbsp;<b>O</b>&nbsp;'+
@@ -410,6 +430,7 @@ var hide_Signup_Notice = true;
             smarty.querySelector('#hidecomments2').addEventListener('change', function(e) {savePlayerValue('hidecomments',e.target.checked)}, false);
             smarty.querySelector('#hidemenubar2').addEventListener('change', function(e) {toggleSettings('hidemenubar',e.target.checked)}, false);
             smarty.querySelector('#hideadverts2').addEventListener('change', function(e) {toggleSettings('hideadverts',e.target.checked)}, false);
+            smarty.querySelector('#mvplaylist2').addEventListener('change', function(e) {savePlayerValue('mvplaylist',e.target.checked)}, false);
             smarty.querySelector('#playlists2').addEventListener('change', function(e) {savePlayerValue('playlists',e.target.checked)}, false);
             smarty.querySelector('#autoplay2').addEventListener('change', function(e) {savePlayerValue('autoplay',e.target.checked)}, false);
             smarty.querySelector('svg').addEventListener('click', function(e) {window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QHFFSLZ7ENUQN&source=url', '_blank');}, false);
@@ -482,7 +503,7 @@ var hide_Signup_Notice = true;
     function blacklistAdd(e, channel, name) {
         let i;
         let blocked = qsa('[polled="'+channel+'"]');
-        
+
         for (i = 0; i < blocked.length; i++) blocked[i].innerHTML = wait(blocked[i]);
         BC.blacklist.push([channel, name]);
         BC.blacklist.sort();
@@ -659,22 +680,24 @@ var hide_Signup_Notice = true;
 
     function savePlayerValue(arg, val) {
         if (arg == 'volume') BC.player.volume = val;
-        else if (arg == 'autoplay') BC.player.autoplay = val;
         else if (arg == 'color') BC.settings.color = val;
+        else if (arg == 'usedark') BC.settings.usedark = val;
+        else if (arg == 'autoplay') BC.player.autoplay = val;
         else if (arg == 'playnext') BC.settings.playnext = val;
         else if (arg == 'playlists') BC.settings.playlists = val;
-        else if (arg == 'usedark') BC.settings.usedark = val;
+        else if (arg == 'mvplaylist') BC.settings.mvplaylist = val;
+        else if (arg == 'hidemenubar') BC.settings.hidemenubar = val;
+        else if (arg == 'hideadverts') BC.settings.hideadverts = val;
         else if (arg == 'useblacklist') BC.settings.useblacklist = val;
         else if (arg == 'hidecarousel') BC.settings.hidecarousel = val;
         else if (arg == 'hidecomments') BC.settings.hidecomments = val;
-        else if (arg == 'hidemenubar') BC.settings.hidemenubar = val;
-        else if (arg == 'hideadverts') BC.settings.hideadverts = val;
         GM.setValue('player', JSON.stringify({
           volume       : BC.player.volume,
           autoplay     : BC.player.autoplay,
           color        : BC.settings.color,
           playnext     : BC.settings.playnext,
           playlists    : BC.settings.playlists,
+          mvplaylist   : BC.settings.mvplaylist,
           usedark      : BC.settings.usedark,
           useblacklist : BC.settings.useblacklist,
           hidecarousel : BC.settings.hidecarousel,
@@ -814,13 +837,13 @@ var hide_Signup_Notice = true;
         let head = qs('head');
         let card = qs('.channel-banner .name a');
         let feed = qs('#rss_feed');
-        
+
         if (action == 'remove' && feed) {
             head.removeChild(feed)
         }
         else if (action == 'add' && card) {
             let href = card.getAttribute("href");
-            let channel = href.match( /\/channel\/([a-z0-9_\-]+)\//i );
+            let channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
             if (channel) {
       	        if (feed && feed.title != channel[1]) head.removeChild(feed);
       	        else if (!feed) {
@@ -837,7 +860,7 @@ var hide_Signup_Notice = true;
     }
 
     function setPreferencesCookie(name, value) {
-        let val, preferences = d.cookie.match(/preferences=(\{[a-z0-9_%:\-]+[^;]*\})/i);
+        let val, preferences = d.cookie.match(/preferences=(\{[a-z0-9_%:-]+[^;]*\})/i);
         if (preferences) {
             if (name == 'autoplay') {
                 val = preferences[1].match(/theme%22:%22([a-z]+)%22/);
@@ -848,6 +871,16 @@ var hide_Signup_Notice = true;
                 d.cookie = "preferences={%22theme%22:%22"+value+"%22%2C%22autoplay%22:"+val[1]+"}; path=/";
             }
         }
+    }
+
+    function addSensitivityCookie(e) {
+        d.cookie = "sensitivity=true; path=/";
+        return false
+    }
+
+    function getCsrftoken() {
+        let csrftoken = d.cookie.match(/csrftoken=([a-z0-9_-]+[^;]*)/i);
+        return csrftoken ? csrftoken[1] : null
     }
 
     var isDark = false;
@@ -884,7 +917,7 @@ var hide_Signup_Notice = true;
             style.type = "text/css";
             style.innerText = '\
                 .night .sidebar-heading, .night .subscribe-button, .night .btn-danger, .night #loader ul li {background-color: '+colours[BC.settings.color].dark+';}\
-                .night .sidebar-recent .video-card.active {border: 1px solid '+colours[BC.settings.color].lighter+';} .night .nav-tabs>li.active {border-bottom-color:'+colours[BC.settings.color].dark+';}\
+                .night .playlist-card.active, .night .sidebar-recent .video-card.active {border: 1px solid '+colours[BC.settings.color].lighter+';} .night .nav-tabs>li.active {border-bottom-color:'+colours[BC.settings.color].dark+';}\
                 .night body, .night .video-card .video-card-text, .night .video-card .video-card-text p i, .night .notify-button, \
                 .night .channel-notify-button, .night .channel-videos-details, .night .channel-videos-title a, .night .channel-videos-text, \
                 .night .video-trending-details, .night .video-trending-title a, .night .video-trending-channel a, .night .video-trending-text, \
@@ -928,8 +961,9 @@ var hide_Signup_Notice = true;
         let comments = qs('#disqus_thread');
         let nocomments = qs('.video-no-discussion');
         let container = qs('#comment-frm-container');
+        showComments = qs('#comment-frm-container > #show-comments');
 
-        if (nocomments) return;
+        if (nocomments || showComments) return;
         if (container && comments) {
             if (comments.childNodes.length > 1) { /* is loading */
                 comments.style.display = 'none';
@@ -951,27 +985,35 @@ var hide_Signup_Notice = true;
         } else if (persistTryHC++ < 30 && !showComments) setTimeout(hideComments, 2000);
     }
 
-    function addSensitivityCookie(e) {
-        d.cookie = "sensitivity=true; path=/";
-        return false;
-    }
-
-    function addMoreRecentVideos(offset) {
-        let name = null;
+    var fetchingMoreRecentVideos = 0;
+    function addMoreRecentVideos(offset, playlistId) {
+        if (fetchingMoreRecentVideos == offset) return;
+        fetchingMoreRecentVideos = offset;
+        let playlist = typeof playlistId != 'undefined' ? playlistId : false;
+        let data, name = null;
         let link = qs('.details .name a');
+        if (link) name = link.href.match( /\/channel\/([a-z0-9_-]+)\//i );
+        if (playlist) {
+            link = location.protocol +"//"+ BC.host +"/playlist/"+ playlist +"/";
+        }
         let sensitivity = d.cookie.match(/sensitivity=((true)|(false))/i);
-        let csrftoken = d.cookie.match(/csrftoken=([a-z0-9_\-]+[^;]*)/i);
-        if (link) name = link.href.match( /\/channel\/([a-z0-9_\-]+)\//i );
         if (qs('.show-more')) qs('.show-more').classList.add("hidden");
-        if (csrftoken && name) {
-            let csrf = csrftoken[1];
+        if (name) {
+            let csrf = getCsrftoken();
             let xhr = new XMLHttpRequest();
-            let data = 'csrfmiddlewaretoken='+csrf+'&name='+name[1]+'&offset='+offset;
             let showall = '';
-            if (sensitivity)
-                if (sensitivity[1] == 'true') showall = '?showall=1';
-            xhr.addEventListener("load", function (e) { pear(e) });
-            xhr.addEventListener("error", function (e) { console.error('XMLHttpRequest recent videos error: '+ e) });
+            if (playlist) {
+                data = 'csrfmiddlewaretoken='+csrf+'&offset='+offset;
+                xhr.addEventListener("load", function (e) { pare(e) });
+                xhr.addEventListener("error", function (e) { console.error('XMLHttpRequest playlist videos error: '+ e) });
+            }
+            else {
+                if (sensitivity)
+                    if (sensitivity[1] == 'true') showall = '?showall=1';
+                data = 'csrfmiddlewaretoken='+csrf+'&name='+name[1]+'&offset='+offset;
+                xhr.addEventListener("load", function (e) { pear(e) });
+                xhr.addEventListener("error", function (e) { console.error('XMLHttpRequest recent videos error: '+ e) });
+            }
             xhr.open("POST", link +'extend/'+ showall, true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhr.send(data);
@@ -1025,18 +1067,96 @@ var hide_Signup_Notice = true;
                 }
             }
             else { console.error('XMLHttpRequest recent videos request error') }
+            fetchingMoreRecentVideos = 0;
         } catch (e) { console.error('XMLHttpRequest recent videos parsing error: '+ e) }
     }
 
+    function pare(e) {
+        try {
+            let i, a1, a, title, pchan, pdate, card, active;
+            let result = JSON.parse(e.target.responseText);
+            if ('undefined' != result.success && result.success) {
+                let hidden = d.createElement("div");
+                hidden.style.display = "none";
+                let sidebar = qs('.sidebar-recent');
+                if (sidebar) {
+                    hidden.innerHTML = result.html;
+                    let offset = sidebar.querySelectorAll('.video-card').length;
+                    let cards = hidden.querySelectorAll('.playlist-video');
+                    let addedoffset = cards.length;
+                    let showmore = d.createElement("div");
+                    showmore.className="show-more-container";
+                    showmore.innerHTML = '<div class="show-more"><span>SHOW MORE</span></div>';
+                    let playlistId = BC.url.match( /[&?]+list=([^&]*[a-z0-9_-]+)/i )[1];
+                    let randomize = BC.url.indexOf('randomize=true') !=-1 ? 'true' : 'false';
+
+                    for (i = 0; i < cards.length; i++) {
+                        if (a1 = cards[i].querySelector('.image-container')) {
+                            a = a1.querySelector('a');
+                            a.href = a.href +'?list='+ playlistId +'&randomize='+ randomize;
+                            a1 = a1.innerHTML
+                                .replace('image','video-card-image')
+                                .replace(/_640x360/g,'_320x180')
+                                .replace(/<\/div>/,'')
+                                .replace(/<\/a>/,'<\/div><\/a>');
+                            title = cards[i].querySelector('.text-container .title').innerHTML;
+                            pchan = cards[i].querySelector('.text-container .channel').innerHTML;
+                            pdate = cards[i].querySelector('.text-container .details span').innerText;
+                            card = d.createElement("div");
+                            card.className="video-card";
+                            card.innerHTML = a1 +
+                               '\n<div class="video-card-text">\n' +
+                                   '<p class="video-card-title">'+title+'</p>\n' +
+                                   '<p class="video-card-channel">'+pchan+'</p>\n' +
+                                   '<p class="video-card-published">'+pdate+'</p>\n</div>';
+                            sidebar.appendChild(card);
+                        }
+                    }
+                    active = sidebar.querySelector('.active');
+                    if (active) active.classList.remove("active");
+                    active = sidebar.querySelector(".video-card > a[href='"+BC.url+"']");
+                    if (active) active.parentNode.classList.add("active");
+                    if (offset == 6 && addedoffset == 25) {
+                        sidebar.parentNode.appendChild(showmore);
+                        qs('.show-more').classList.remove("hidden");
+                        qs('.show-more').addEventListener("click", function(e){ addMoreRecentVideos(offset+addedoffset+2, playlistId) }, false);
+                    }
+                    else if (offset > 6 && addedoffset == 25 && qs('.show-more')) {
+                        qs('.show-more').outerHTML = showmore.outerHTML;
+                        qs('.show-more').classList.remove("hidden");
+                        qs('.show-more').addEventListener("click", function(e){ addMoreRecentVideos(offset+addedoffset+2, playlistId) }, false);
+                    }
+                }
+            }
+            else { console.error('XMLHttpRequest playlist videos request error') }
+            fetchingMoreRecentVideos = 0;
+        } catch (e) { console.error('XMLHttpRequest playlist videos parsing error: '+ e) }
+    }
+
+    var fetchingMvplaylist = !1;
     var mostViewedPlaylist = {slider:null,index:0,length:0,cardWidth:function(){let o = qs('.mvplaylist').getBoundingClientRect();return (!o || !o.width ? 0 : Math.round(o.width/240))}};
     function addMostViewedPlaylist() {
         let link = qs('.details .name a');
         let sensitivity = d.cookie.match(/sensitivity=((true)|(false))/i);
-        let csrftoken = d.cookie.match(/csrftoken=([a-z0-9_\-]+[^;]*)/i);
 
-        if (qs('.mvplaylist')) return;
-        if (csrftoken && link) {
-            let csrf = csrftoken[1];
+        if (qs('.mvplaylist.row') || fetchingMvplaylist) return;
+        else {
+            let el, comments;
+            let parent = qs('.video-container');
+            let row = d.createElement("div");
+            row.className = 'mvplaylist row';
+            if (comments = qs('.comments.row')) {
+                el = comments;
+            }
+            else {
+                el = parent.children[3];
+                el.className = 'comments row';
+            }
+            parent.insertBefore(row, el);
+        }
+        fetchingMvplaylist = 1;
+        if (link) {
+            let csrf = getCsrftoken();
             let xhr = new XMLHttpRequest();
             let data = 'csrfmiddlewaretoken='+csrf;
             let showall = '';
@@ -1062,18 +1182,18 @@ var hide_Signup_Notice = true;
                 let html = result.html.match(/(<div class="video-card"[^<]*?>[\s\S]*<\/div>[\s\n]*?<\/div>)[\s\n]*?<\/div>[\s\n]*?<\/div>/i);
                 if (html && html[1]) {
                     hidden.innerHTML = html[1];
+                    let active = '';
                     let cards = hidden.querySelectorAll('.video-card');
-                    let row = d.createElement("div");
-                    let most = d.createElement("div");
+                    let row = qs(".mvplaylist.row");
+                    let title = d.createElement("div");
                     let content = d.createElement("div");
                     let arrow = d.createElement("div");
                     let slider = d.createElement("div");
                     mostViewedPlaylist.length = cards.length;
                     mostViewedPlaylist.slider = slider;
-                    row.className = 'mvplaylist row';
-                    most.style = "width: 146px;margin: 20px 37px 10px;";
-                    most.innerHTML = '<h2 class="sidebar-heading">Most Viewed</h2>';
-                    row.appendChild(most);
+                    title.className = 'playlist-title';
+                    title.innerHTML = '<h2 class="sidebar-heading">Most Viewed ('+ cards.length +')</h2>';
+                    row.appendChild(title);
 
                     arrow.className = 'playlistdn playlistbtn disabled';
                     arrow.innerHTML = '<b>&lt;</b>';
@@ -1084,14 +1204,23 @@ var hide_Signup_Notice = true;
                     arrow.innerHTML = '<b>&gt;</b>';
                     content.appendChild(arrow);
                     slider.className = 'mvslider';
+
                     for (i = 0; i < cards.length; i++) {
-                        cards[i].className += ' playlist-card';
+                        let cardActive = cards[i].querySelector("a[href='"+BC.path+"']");
+                        if (cardActive) {
+                            mostViewedPlaylist.slider.style.marginLeft = '-'+ (i * 218) +'px';
+                            if (i > 0) content.querySelector('.playlistdn').classList.remove('disabled');
+                            if (i+1 == cards.length) content.querySelector('.playlistup').classList.add('disabled');
+                            mostViewedPlaylist.index = i;
+                            active = ' active';
+                        }
+                        else active = '';
+                        cards[i].className += ' playlist-card'+ active;
+                        cards[i].innerHTML = cards[i].innerHTML.replace(/<\/div>(?![\s\S]*<\/div>)/, '\n<span class="video-card-published sequence">'+(i+1)+'</span>\n</div>');
                         slider.appendChild(cards[i]);
                     }
                     content.appendChild(slider);
                     row.appendChild(content);
-                    let parent = qs('.video-container');
-                    parent.insertBefore(row, parent.children[3]);
 
                     let left = qs('.mvplaylist .playlistdn');
                     left.addEventListener("click", function (e) {
@@ -1105,7 +1234,7 @@ var hide_Signup_Notice = true;
                     let right = qs('.mvplaylist .playlistup');
                     right.addEventListener("click", function (e) {
                         if (this.classList.contains('disabled')) return false;
-                        if (mostViewedPlaylist.index < mostViewedPlaylist.length - mostViewedPlaylist.cardWidth()) {
+                        if (mostViewedPlaylist.index <= mostViewedPlaylist.length - mostViewedPlaylist.cardWidth()) {
                             mostViewedPlaylist.slider.style.marginLeft = '-'+ (++mostViewedPlaylist.index * 218) +'px';
                             if (mostViewedPlaylist.index + mostViewedPlaylist.cardWidth() >= mostViewedPlaylist.length) this.classList.add('disabled');
                             if (mostViewedPlaylist.index > 0) this.previousSibling.classList.remove('disabled');
@@ -1114,7 +1243,185 @@ var hide_Signup_Notice = true;
                 }
             }
             else { console.error('XMLHttpRequest most viewed request error') }
+            fetchingMvplaylist = !1;
         } catch (e) { console.error('XMLHttpRequest most viewed parsing error: '+ e) }
+    }
+
+    var playlists = {};
+    var fetchingPlaylists = !1;
+    function addChannelPlaylists() {
+        let link = qs('.details .owner a');
+
+        if (fetchingPlaylists) return;
+        fetchingPlaylists = 1;
+        if (link) {
+            let csrf = getCsrftoken();
+            let xhr = new XMLHttpRequest();
+            let data = 'csrfmiddlewaretoken='+csrf;
+            let showall = '';
+
+            xhr.addEventListener("load", function (e) { addPlaylist(e) });
+            xhr.addEventListener("error", function (e) { console.error('XMLHttpRequest most viewed error: '+ e) });
+            xhr.open("POST", link, true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send(data);
+        }
+    }
+
+    var playAll = null;
+    function addPlaylist(e) {
+        try {
+            let link, plName, xhr, m, re, i = 0;
+            let result = JSON.parse(e.target.responseText);
+
+            if ('undefined' != result.success && result.success) {
+                let el, row, comments;
+                let parent = qs('.video-container');
+                let csrf = getCsrftoken();
+                let data = 'csrfmiddlewaretoken='+csrf;
+                re = /class="playlist-card">[\n\s]+<a href="([a-zA-Z0-9\/_-]+)"[\s\S]*?(?!<\/a)+<div class="title">(.*)<\/div>/g
+                do {
+                    m = re.exec(result.html);
+                    if (m) {
+                        xhr = new XMLHttpRequest();
+                        plName = 'pl'+ m[1].substr(10, 12);
+                        playlists[plName] = {item:i++,slider:null,index:0,length:0,cardWidth:function(){let o = qs('#'+ plName +'.playlist').getBoundingClientRect();return (!o || !o.width ? 0 : Math.round(o.width/240))}};
+                        row = qs('#'+plName+'.playlist.row');
+                        if (!row) {
+                            row = d.createElement("div");
+                            row.className = 'playlist row';
+                            row.setAttribute('id', plName);
+                            if (comments = qs('.comments.row')) {
+                                el = comments;
+                            }
+                            else {
+                                if (BC.settings.mvplaylist)
+                                    el = parent.children[4];
+                                else el = parent.children[3];
+                                el.className = 'comments row';
+                            }
+                            parent.insertBefore(row, el);
+                        }
+                        link = location.protocol +"//"+ BC.host + m[1];
+
+                        xhr.addEventListener("load", function (e) { pier(e) });
+                        xhr.addEventListener("error", function (e) { console.error('XMLHttpRequest most viewed error: '+ e) });
+                        xhr.open("POST", link, true);
+                        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xhr.send(data);
+                    }
+                } while (m);
+            }
+            else {
+                console.error('XMLHttpRequest profile page request error');
+                fetchingPlaylists = !1;
+            }
+        } catch (e) { console.error('XMLHttpRequest profile page parsing error: '+ e) }
+    }
+
+    function pier(e) {
+        try {
+            let i, a1, pdate, card
+            let result = JSON.parse(e.target.responseText);
+            if ('undefined' != result.success && result.success) {
+                if (!playAll) {
+                    playAll = result.html.match( /<span class="fa-layers">.*<\/span>/ );
+                    if (playAll) playAll = playAll[0].replace('<span', '<span title="Play All"')
+                }
+                let link = result.canonical.match( /.*\/playlist\/([a-z0-9_-]+)\//i );
+                let hidden = d.createElement("div");
+                hidden.style.display = "none";
+                let html = result.html.match(/(<div .* class="playlist-video"[^<]*?>[\s\S]*<\/div>[\s\n]*?<\/div>)[\s\n]*?<\/div>[\s\n]*?<\/div>/i);
+                if (html && html[1]) {
+                    hidden.innerHTML = html[1];
+                    let active = '';
+                    let plName = 'pl'+ link[1];
+                    let cards = hidden.querySelectorAll('.playlist-video');
+                    let showMore = hidden.querySelector('.show-more-container .show-more:not(.hidden)');
+                    let row = qs("#"+ plName +'.row');
+                    let title = d.createElement("div");
+                    let content = d.createElement("div");
+                    let arrow = d.createElement("div");
+                    let slider = d.createElement("div");
+                    playlists[plName].length = cards.length;
+                    playlists[plName].slider = slider;
+                    title.className = 'playlist-title';
+
+                    title.innerHTML = '<h2 class="sidebar-heading">'+ result.title +' ('+ cards.length +')'+ playAll +'</h2>';
+                    row.appendChild(title);
+                    if (playAll) {
+                        let href = cards[0].querySelector('a').href;
+                        title.querySelector('span').addEventListener("click", function (e) {
+                            window.location.href = href +'?list='+ link[1] +'&randomize=false'
+                        });
+                    }
+
+                    arrow.className = 'playlistdn playlistbtn '+ plName +' disabled';
+                    arrow.innerHTML = '<b>&lt;</b>';
+                    content.style = 'width: 100%;margin: 0px;padding: 0px; overflow:hidden;display: inline-block; max-height: 195px;';
+                    content.appendChild(arrow);
+                    arrow = d.createElement("div");
+                    arrow.className = 'playlistup playlistbtn '+ plName + (cards.length > 3 ? '' : ' disabled');
+                    arrow.innerHTML = '<b>&gt;</b>';
+                    content.appendChild(arrow);
+                    slider.className = 'plslider';
+
+                    for (i = 0; i < cards.length; i++) {
+                        if (a1 = cards[i].querySelector('.image-container')) {
+                            a1 = a1.innerHTML
+                                .replace('image','video-card-image')
+                                .replace(/_640x360/g,'_320x180')
+                                .replace(/<\/div>/,'')
+                                .replace(/<\/a>/,'<\/div><\/a>');
+                            title = cards[i].querySelector('.text-container .title').innerHTML;
+                            pdate = cards[i].querySelector('.text-container .details span').innerText;
+                            card = d.createElement("div");
+                            card.className="video-card";
+                            card.innerHTML = a1 +
+                               '\n<div class="video-card-text">\n' +
+                                   '<p class="video-card-title">'+title+'</p>\n' +
+                                   '<p class="video-card-published">'+pdate+'</p>\n' +
+                                   '<span class="video-card-published sequence">'+(i+1)+'</span>\n</div>';
+
+                            let cardActive = card.querySelector("a[href='"+BC.path+"']");
+                            if (cardActive) {
+                                playlists[plName].slider.style.marginLeft = '-'+ (i * 218) +'px';
+                                if (i > 0) content.querySelector('.playlistdn.'+ plName).classList.remove('disabled');
+                                if (i+1 == cards.length) content.querySelector('.playlistup.'+ plName).classList.add('disabled');
+                                playlists[plName].index = i;
+                                active = ' active';
+                            }
+                            else active = '';
+                            card.className += ' playlist-card'+ active;
+                            slider.appendChild(card);
+                        }
+                    }
+                    content.appendChild(slider);
+                    row.appendChild(content);
+
+                    let left = qs('.playlistdn.'+ plName);
+                    left.addEventListener("click", function (e) {
+                        if (this.classList.contains('disabled')) return false;
+                        if (playlists[plName].index > 0) {
+                            playlists[plName].slider.style.marginLeft = '-'+ (--playlists[plName].index * 218) +'px';
+                            if (playlists[plName].index <= 0) this.classList.add('disabled');
+                            if (playlists[plName].index < playlists[plName].length + playlists[plName].cardWidth()) this.nextSibling.classList.remove('disabled');
+                        }
+                    });
+                    let right = qs('.playlistup.'+ plName);
+                    right.addEventListener("click", function (e) {
+                        if (this.classList.contains('disabled')) return false;
+                        if (playlists[plName].index <= playlists[plName].length - playlists[plName].cardWidth()) {
+                            playlists[plName].slider.style.marginLeft = '-'+ (++playlists[plName].index * 218) +'px';
+                            if (playlists[plName].index + playlists[plName].cardWidth() >= playlists[plName].length) this.classList.add('disabled');
+                            if (playlists[plName].index > 0) this.previousSibling.classList.remove('disabled');
+                        }
+                    });
+                }
+            }
+            else { console.error('XMLHttpRequest playlists request error') }
+            fetchingPlaylists = !1;
+        } catch (e) { console.error('XMLHttpRequest playlists parsing error: '+ e) }
     }
 
     function qs(selector) { return document.querySelector(selector) }
@@ -1130,7 +1437,7 @@ var hide_Signup_Notice = true;
     }
 
     function init(e) {
-        let settings = "{\"volume\":0.5,\"autoplay\":true,\"color\":\"none\",\"playnext\":false,\"usedark\":true,\"playlists\":true,"+
+        let settings = "{\"volume\":0.5,\"autoplay\":true,\"color\":\"none\",\"playnext\":false,\"usedark\":true,\"playlists\":true,\"mvplaylist\":true,"+
                         "\"useblacklist\":true,\"hidecarousel\":false,\"hidecomments\":false,\"hidemenubar\":true,\"hideadverts\":true}";
         GM.getValue('player', "{}").then(function (value) {
             if (value && value != '{}') {
@@ -1139,6 +1446,8 @@ var hide_Signup_Notice = true;
                 BC.host = null;
                 BC.path = null;
                 BC.loaded = !1;
+                BC.loader = null;
+                BC.themes = null;
                 BC.blacklist = [];
                 BC.page = 'homepage';
                 BC.previouslisting = '';
@@ -1156,6 +1465,7 @@ var hide_Signup_Notice = true;
                     usedark      : player.usedark,
                     playnext     : player.playnext,
                     playlists    : player.playlists,
+                    mvplaylist   : player.mvplaylist,
                     hideadverts  : player.hideadverts,
                     hidemenubar  : player.hidemenubar,
                     useblacklist : player.useblacklist,
