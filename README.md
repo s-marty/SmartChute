@@ -36,7 +36,10 @@ Most features are selectable using the Smarty menu.
 * 32 More video choices on Video watch page vs. 6
 * Unlimited video choices using "SHOW MORE" button, vs. 6
 * OpenSearch browser search to search from address or search bar
-* Rss channel feed subscribe link
+* Rss channel feed subscribe link (Browser extension now needed)
+* &nbsp;&nbsp;All browsers have now dropped live bookmarks/rss feeds
+* &nbsp;&nbsp;The rss url format is:
+* &nbsp;&nbsp;https://www.bitchute.com/feeds/rss/channel/[CHANNEL_NAME]/
 * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Smarty menu always available
 
 
