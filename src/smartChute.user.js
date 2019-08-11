@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         19.5.2
+// @version         19.8.11
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -13,7 +13,7 @@
 // @icon            https://raw.githubusercontent.com/s-marty/SmartChute/master/images/smartChute.png
 // @downloadURL     https://github.com/s-marty/SmartChute/raw/master/src/smartChute.user.js
 // @contributionURL https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QHFFSLZ7ENUQN&source=url
-// @include         /^https?://www\.bitchute\.com/.*$/
+// @include         /^https?://(www|search)\.bitchute\.com/.*$/
 // @run-at          document-end
 // @grant           GM.getValue
 // @grant           GM.setValue
@@ -43,7 +43,10 @@
 *** 32 More video choices on Video watch page vs. 6
 *** Unlimited video choices using "SHOW MORE" button, vs. 6
 *** OpenSearch browser search to search from address or search bar
-*** Rss channel feed subscribe link
+*** Rss channel feed subscribe link (Browser extension now needed)
+***   All browsers have now dropped live bookmarks/rss feeds
+***   The rss url format is:
+***   https://www.bitchute.com/feeds/rss/channel/[CHANNEL_NAME]/
 ***          Smarty menu always available
 
 ***  ***  Does not & will not work well with IE and IEdge  ***/
@@ -79,8 +82,8 @@ var hide_Signup_Notice = true;
         BC.host         = window.location.hostname;
         BC.path         = window.location.pathname;
         BC.playlist     = BC.url.indexOf('list=') !=-1;
+        BC.searchpage   = BC.url.indexOf('/search') !=-1;
         BC.watchpage    = BC.path.indexOf('/video') !=-1;
-        BC.searchpage   = BC.path.indexOf('/search/') !=-1;
         BC.profilepage  = BC.path.indexOf('/profile/') !=-1;
         BC.channelpage  = BC.path.indexOf('/channel/') !=-1;
         BC.categorypage = BC.path.indexOf('/category/') !=-1;
@@ -232,14 +235,17 @@ var hide_Signup_Notice = true;
                 BC.player.api.addEventListener('volumechange', function(e) {
                     savePlayerValue('volume', (Math.round(e.target.volume / 0.01) * 0.01))
                 }, false);
-
-                let playnext = qs("label.sidebar-autoplay");
+            }
+            let sidebarnext = qs(".sidebar-next");
+            let playnext = qs("label.sidebar-autoplay:not(.active)");
+            if (sidebarnext && playnext) {
                 playnext.addEventListener('mousedown', function(e) {
                     if (e.which===1) {
                        let checked = qs("input#autoplay-toggle").checked;
                        savePlayerValue('playnext', !checked)
                     }
                 }, false);
+                playnext.classList.add('active')
             }
             if (BC.settings.hidecomments) setTimeout(hideComments, 2000);
             if (BC.playlist) {
@@ -266,10 +272,11 @@ var hide_Signup_Notice = true;
         }
         else if (BC.homepage || BC.categorypage) {
             BC.page = 'homepage';
+            let listingTabs = qs('#listing-tabs.listening');
             let listingsAll = qs('#listing-all > div.row');
             let listingsPopular = qs('#listing-popular > div.row');
 
-            if (!BC.listenersIni) {
+            if (!listingTabs) {
                 qs("ul.nav-tabs-list li a[href='#listing-all']")
                   .addEventListener('click', function(e){ applyBlacklist('#listing-all > div.row > div', 'all') }, false);
                 qs("ul.nav-tabs-list li a[href='#listing-popular']")
@@ -301,7 +308,7 @@ var hide_Signup_Notice = true;
                     }
                 },{ childList: true });
 
-                BC.listenersIni = true;
+                qs('#listing-tabs').classList.add('listening');
             }
             if (BC.settings.useblacklist) {
                 listingsAllHeight = Math.round(listingsAll.getBoundingClientRect().height);
@@ -957,6 +964,8 @@ var hide_Signup_Notice = true;
 
     var persistTryHC = 0;
     var showComments = null;
+    var commentsFrame = null;
+    var commentsUrl = '';
     function hideComments(e) {
         let comments = qs('#disqus_thread');
         let nocomments = qs('.video-no-discussion');
@@ -965,10 +974,16 @@ var hide_Signup_Notice = true;
 
         if (nocomments || showComments) return;
         if (container && comments) {
-            if (comments.childNodes.length > 1) { /* is loading */
-                comments.style.display = 'none';
-                if (persistTryHC++ < 30 && !showComments)
-                    setTimeout(hideComments, 2000);
+            comments.style.display = 'none';
+            if (commentsFrame = comments.querySelector('iframe')) {
+                commentsUrl = commentsFrame.getAttribute('src')
+            }
+            if (commentsFrame && commentsUrl) {
+                commentsFrame.setAttribute('src', 'about:blank');
+            }
+            else {
+                if (persistTryHC++ < 60 && !showComments)
+                    setTimeout(hideComments, 1000);
                 return
             }
             showComments = d.createElement("div");
@@ -980,6 +995,7 @@ var hide_Signup_Notice = true;
             showComments.addEventListener('click', function(e) {
                 if (e.which===1)
                     qs('#disqus_thread').style.display = 'block';
+                    commentsFrame.setAttribute('src', commentsUrl);
                     this.style.display = 'none';
             }, false);
         } else if (persistTryHC++ < 30 && !showComments) setTimeout(hideComments, 2000);
@@ -1451,7 +1467,6 @@ var hide_Signup_Notice = true;
                 BC.blacklist = [];
                 BC.page = 'homepage';
                 BC.previouslisting = '';
-                BC.listenersIni = false;
                 BC.miniPlayerIni = false;
                 BC.player = {
                     api     : null,
