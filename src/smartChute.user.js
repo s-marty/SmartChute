@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         19.8.11
+// @version         19.11.19
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -19,6 +19,13 @@
 // @grant           GM.setValue
 // @noframes
 // ==/UserScript==
+
+/* greasyfork.org jshint syntax checking hacks */
+/* jshint asi: true */
+/* jshint boss: true */
+/* jshint esversion: 6 */
+/* jshint loopfunc: true */
+/* jshint multistr: true */
 
 /** **********************   Features   **********************
 *** Accelerated Bit Chute user experience ahead
@@ -61,7 +68,7 @@ var hide_Signup_Notice = true;
 (function() {
     "use strict";
 
-    var BC = {}
+    var BC = {};
     var d = document;
     var miniPlayerX = 0;
     var miniPlayerY = 0;
@@ -144,11 +151,17 @@ var hide_Signup_Notice = true;
                     .night .playlistbtn.disabled b {color: #2c2a2d;} @media (min-width: 768px) {.plslider, .mvslider {max-width: 660px;} .playlistup {margin-left:475px;}.mvplaylist.row, .playlist.row {width: 505px;}}\
                     @media (min-width: 992px) {.plslider, .mvslider {max-width: 878px;} .playlistup {margin-left:693px;}.mvplaylist.row, .playlist.row {width: 723px;}}';
             }
-            if (BC.settings.hideadverts) style.innerText += '.sidebar .rcad-container, .sidebar > div:not(.sidebar-video) {display:none !important;}';
             if (hide_Donation_Bar) style.innerText += '.video-container .text-center {display: none !important;}';
             if (hide_Cookie_Notice) style.innerText += '#alert-cookie {display: none !important;}';
             if (hide_Signup_Notice) style.innerText += '#alert-signup {display: none !important;}';
             if (use_Square_Icons) style.innerText += '.channel-banner .image-container {border-radius:0px !important;}';
+            if (BC.settings.hideadverts) {
+                style.innerText += '.sidebar .rcad-container, .sidebar > div:not(.sidebar-video) {display:none !important;}';
+                let affiliates = null;
+                if (affiliates = qs('.affiliate-container')) {
+                    affiliates.outerHTML = ''
+                }
+            }
             d.documentElement.appendChild(style);
             if (BC.settings.hidemenubar) window.addEventListener('scroll', floatHeaders);
             addBrowserSearch();
@@ -159,7 +172,7 @@ var hide_Signup_Notice = true;
             BC.page = 'watchpage';
                 /* Provide mini player */
             BC.player.api = qs('video#player');
-            if (BC.player.api != null) {
+            if (BC.player.api !== null) {
                 if (!BC.player.rect) {
                     window.scrollTo(0, 0);
                     BC.player.rect = BC.player.api.getBoundingClientRect();
@@ -413,7 +426,7 @@ var hide_Signup_Notice = true;
         let menu = qs('ul.nav-tabs-list');
         let smarty = qs('#smarty_tab');
 
-        if (smarty == null) {
+        if (smarty === null) {
             smarty = d.createElement("li");
             smarty.innerHTML = tabContent;
             menu.appendChild(smarty);
@@ -586,7 +599,7 @@ var hide_Signup_Notice = true;
                         topNav.style.top = '0px';
                     }
                 }
-                if (topfloat) {
+                if (topfloat || scrolled < 1) {
                     if (scrolled <= tabTop - 60) {
                         tabfloat = false;
                         tabNav.style.top = '';
@@ -849,16 +862,17 @@ var hide_Signup_Notice = true;
             head.removeChild(feed)
         }
         else if (action == 'add' && card) {
+            let title = card.innerText;
             let href = card.getAttribute("href");
             let channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
             if (channel) {
-      	        if (feed && feed.title != channel[1]) head.removeChild(feed);
+      	        if (feed && feed.title != title) head.removeChild(feed);
       	        else if (!feed) {
           	        let rssLink = d.createElement('link');
                     rssLink.setAttribute('rel', 'alternate');
                     rssLink.setAttribute('href', location.protocol +'//www.bitchute.com/feeds/rss/channel/' + channel[1] + '/');
                     rssLink.setAttribute('type', 'application/rss+xml');
-                    rssLink.setAttribute('title', channel[1]);
+                    rssLink.setAttribute('title', title);
                     rssLink.setAttribute('id', 'rss_feed');
                     head.appendChild(rssLink);
                 }
@@ -896,10 +910,10 @@ var hide_Signup_Notice = true;
     function setTheme() {
         if (!isDark && BC.settings.usedark) {
             let theme = qs('link#css-theme');
-            if (theme != null) {
+            if (theme !== null) {
                 if (theme.href.indexOf('night.css') ==-1) {
                     let version = theme.href.match( /\/static\/([a-z]+[0-9]+)\//i );
-                    if (version != null && version[1] != null) {
+                    if (version !== null && version[1] !== null) {
                         BC.version = version[1];
                         theme.setAttribute('href','/static/'+ BC.version +'/css/theme-default-night.css');
                     }
@@ -1399,7 +1413,8 @@ var hide_Signup_Notice = true;
                                    '<p class="video-card-published">'+pdate+'</p>\n' +
                                    '<span class="video-card-published sequence">'+(i+1)+'</span>\n</div>';
 
-                            let cardActive = card.querySelector("a[href='"+BC.path+"']");
+                            let link = card.querySelector("a").getAttribute("href");
+                            let cardActive = link.indexOf(BC.path) !=-1;
                             if (cardActive) {
                                 playlists[plName].slider.style.marginLeft = '-'+ (i * 218) +'px';
                                 if (i > 0) content.querySelector('.playlistdn.'+ plName).classList.remove('disabled');
@@ -1445,7 +1460,9 @@ var hide_Signup_Notice = true;
     function qsa(selector) { return document.querySelectorAll(selector) }
 
     function addListener(target, fn, config) {
+        // jshint ignore:start
         var cfg = {...{attributes:!1, childList:!1, characterData:!1, subtree:!1}, ...config};
+        // jshint ignore:end
         var observer = new MutationObserver(function(mutations) {
           mutations.forEach(function(mutation) { fn(mutation) })});
         observer.observe(target, cfg);
@@ -1457,7 +1474,9 @@ var hide_Signup_Notice = true;
                         "\"useblacklist\":true,\"hidecarousel\":false,\"hidecomments\":false,\"hidemenubar\":true,\"hideadverts\":true}";
         GM.getValue('player', "{}").then(function (value) {
             if (value && value != '{}') {
+                // jshint ignore:start
                 let player = {...settings, ...JSON.parse(value)};
+                // jshint ignore:end
                 BC.url = null;
                 BC.host = null;
                 BC.path = null;
