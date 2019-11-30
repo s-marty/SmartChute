@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         19.11.19
+// @version         19.11.30
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -63,6 +63,7 @@ var use_Square_Icons = true;
 var hide_Donation_Bar = true;
 var hide_Cookie_Notice = true;
 var hide_Signup_Notice = true;
+var homepage_go_to_all = true;
 /* End Editable options */
 
 (function() {
@@ -333,7 +334,18 @@ var hide_Signup_Notice = true;
             if (BC.settings.hidecarousel) { // The only way to pause this thing
                 if (qs('#carousel')) qs('#carousel').innerHTML = '';
             }
-            applyBlacklist('#listing-all > div.row > div');
+
+            if (homepage_go_to_all) {
+                let preferAll = qs("ul.nav-tabs-list li a[href='#listing-all']");
+                if (preferAll !== null && preferAll.parentNode.className.indexOf('active') ==-1) {
+                    var click = new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    preferAll.dispatchEvent(click);
+                }
+            }
+            else applyBlacklist('#listing-popular > div.row > div');
             setChannelFeed('remove');
         }
         createSmartyButton();
@@ -386,7 +398,7 @@ var hide_Signup_Notice = true;
                         card.setAttribute('title', name +' is blacklisted ☺');
                         card.classList.add('userisblacklisted')
                     }
-                    else {
+                    else if (! card.parentNode.querySelector('.add-to-blacklist')) {
                         let button = blacklistButton();
                         card.parentNode.appendChild(button);
                         button.addEventListener('click', function(e){
