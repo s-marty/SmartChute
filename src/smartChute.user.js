@@ -13,7 +13,7 @@
 // @icon            https://raw.githubusercontent.com/s-marty/SmartChute/master/images/smartChute.png
 // @downloadURL     https://github.com/s-marty/SmartChute/raw/master/src/smartChute.user.js
 // @contributionURL https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QHFFSLZ7ENUQN&source=url
-// @include         /^https?://(www|search)\.bitchute\.com/.*$/
+// @include         /^https?://www\.bitchute\.com/.*$/
 // @run-at          document-end
 // @grant           GM.getValue
 // @grant           GM.setValue
