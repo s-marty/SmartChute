@@ -91,6 +91,8 @@ The bottom menu section contains a scrollable list of blocked, annoying, fake, r
 ![Download Icon](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/downloadLink.png)
 
 **Download Icon**
+
+---
 <br/>
 
 <br/>
@@ -98,6 +100,8 @@ The bottom menu section contains a scrollable list of blocked, annoying, fake, r
 ![Download Modal](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/downloadModal.png)
 
 **Download Modal**
+
+---
 <br/>
 
 <br/>
@@ -105,6 +109,8 @@ The bottom menu section contains a scrollable list of blocked, annoying, fake, r
 ![Playlist Container](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/playlist.png)
 
 **Playlist Container**
+
+---
 <br/>
 
 <br/>
@@ -112,6 +118,11 @@ The bottom menu section contains a scrollable list of blocked, annoying, fake, r
 ![Blacklist Icon](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/blacklistButton.png)
 
 **Blacklist Button Icon**
+
+---
+<br/>
+
+<br/>
 
 And of course please don't forget to [**donate**](https://github.com/s-marty/SmartChute/wiki/Donate) to keep this script well maintained.
 
