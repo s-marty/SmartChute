@@ -66,20 +66,20 @@
 ***  ***  Does not & will not work well with IE and IEdge  ***/
 
 /* Editable options */
-var use_Square_Icons = true;
-var hide_Donation_Bar = true;
-var hide_Cookie_Notice = true;
-var hide_Signup_Notice = true;
-var homepage_go_to_all = true;
+const use_Square_Icons = true;
+const hide_Donation_Bar = true;
+const hide_Cookie_Notice = true;
+const hide_Signup_Notice = true;
+const homepage_go_to_all = true;
 const BC_Debug = false;
 /* End Editable options */
 
-const name = "SmartChute";
 
 (function() {
     "use strict";
 
 const d = document;
+const name = "SmartChute";
 const scriptHandler = GM.info.scriptHandler;
 const isChrome = navigator.userAgent.indexOf('Chrome') !=-1;
 const BC = {
@@ -98,9 +98,6 @@ const BC = {
 
 
     chuteMePlease: (e) => {
-        let style, bar, size, sidebarnext, playnext, sensitivityWarning,
-            listingTabs, listingsAll, listingsPopular, preferAll, affiliates;
-
 
         BC.url          = window.location.href;
         BC.host         = window.location.hostname;
@@ -145,10 +142,10 @@ const BC = {
                 BC.themes = true;
             }
             if (BC.searchpage || BC.profilepage || BC.playlistpage) return;
-            style = d.createElement("style");
+            let style = d.createElement("style");
             style.type = "text/css";
             style.innerText = `
-                .nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {border: 1px solid #f37835; border-radius:5px;} .playlist-card.active {border: 1px solid #f37835; border-radius:5px;}
+                .nav-tabs-list {min-width: 500px !important; width: 100%;} .sidebar-recent .video-card.active {box-shadow: 0 0 1em 0.2em #f37835; border-radius:5px;} .playlist-card.active {border-top: 1px solid #f37835bb; box-shadow: 0 2px 1em 0.2em #f37835; border-radius:5px;}
                 svg.smarty-donate {float:right;cursor: pointer; color:#209227;display: block;}  svg.smarty-donate:hover {-webkit-transform:rotate(14deg) scale(1.2);-o-transform:rotate(14deg) scale(1.2);transform:rotate(14deg) scale(1.2);color:#30a247;}
                 #loader-container {opacity: 0.5;} span.add-to-blacklist { position: absolute; top: 4px; left: 4px; z-index: 50; width:30px; height:30px; } a.side-toggle {cursor: pointer; }
                 svg.smarty-donate {-webkit-transition: transform 0.25s ease-in, color 0.25s; -moz-transition: transform 0.25s ease-in, color 0.25s; -o-transition: transform 0.25s ease-in, color 0.25s; transition: transform 0.25s ease-in, color 0.25s;}
@@ -195,7 +192,9 @@ const BC = {
                     .playlistbtn {cursor:pointer;width: 30px;height:195px;padding-top:85px;background-color: #ddd;text-align:center;position: absolute; z-index: 80;}
                     .playlistbtn b {cursor:pointer; user-select: none; -moz-user-select: none; -webkit-user-select: none;} .playlistbtn.disabled {cursor:default; opacity:0.3;} .playlistbtn.disabled b {color: #ddd;cursor:default;}
                     .playlist-title span {margin-left:16px;} .playlist-title span:hover {color:#ffaa00;} .video-card-published.sequence {position: absolute;bottom: 0px;right: 3px; z-index:50;} .playlist svg.fa-square {opacity: 0.4;}
-                    .mvplaylist .playlist-card, .playlist .playlist-card {width: 208px;height:195px;margin: 0 5px;} .playlist-card .video-card-title {height: 52px;} .night .playlistbtn {background-color: #2c2a2d; background:}
+                    .mvplaylist .playlist-card, .playlist .playlist-card {width: 208px;height:195px;margin: 0 5px;} .night .playlistbtn {background-color: #2c2a2d; background:}
+                    .playlist-card .video-card-title {height: 52px; width: 200px; max-height: 52px; max-width: 200px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;}
+                    .playlist-card.active .video-card-title {max-height: 47px;}
                     .night .playlistbtn.disabled b {color: #2c2a2d;} @media (min-width: 768px) {.plslider, .mvslider {max-width: 660px;} .playlistup {margin-left:475px;}.mvplaylist.row, .playlist.row {width: 505px;}}
                     @media (min-width: 992px) {.plslider, .mvslider {max-width: 878px;} .playlistup {margin-left:693px;}.mvplaylist.row, .playlist.row {width: 723px;}}`;
             }
@@ -205,7 +204,7 @@ const BC = {
             if (use_Square_Icons) style.innerText += '.channel-banner .image-container {border-radius:0px !important;}';
             if (BC.settings.hideadverts) {
                 style.innerText += '.sidebar .rcad-container, .sidebar > div:not(.sidebar-video) {display:none !important;}';
-                affiliates = null;
+                let affiliates = null;
                 if (affiliates = qs('.affiliate-container')) {
                     affiliates.outerHTML = ''
                 }
@@ -215,6 +214,7 @@ const BC = {
             if (BC.settings.hidemenubar) window.addEventListener('scroll', BC.floatHeaders);
             BC.addBrowserSearch();
             BC.loaded = 1;
+            debug('>>>>>>>>>>>>>> BC load <<<<<<<<<<=');
         }
 
         if (BC.watchpage) {
@@ -240,12 +240,11 @@ const BC = {
                             d.addEventListener("fullscreenchange", () => { BC.onFullScreen()});
                             d.addEventListener("mozfullscreenchange", () => { BC.onFullScreen()});
                             d.addEventListener("webkitfullscreenchange", () => { BC.onFullScreen()});
-                            style = d.createElement("style");
+                            let style = d.createElement("style");
                             style.type = "text/css";
                             style.innerText = `
                                 html:not(.isfullscreen).s-marty-miniplayer video#player, html:not(.isfullscreen).s-marty-miniplayer .plyr__video-wrapper, html:not(.isfullscreen).s-marty-miniplayer .plyr--video {opacity: 0.94;}
-                                html:not(.isfullscreen).s-marty-miniplayer .video-container .wrapper {position: fixed;z-index: 100;background-color:transparent;
-                                border:1px solid rgba(255,255,255,.3);box-shadow:0 4px 5px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12),0 2px 4px -1px rgba(0,0,0,.4)}
+                                html:not(.isfullscreen).s-marty-miniplayer .video-container .wrapper {position: fixed;z-index: 100;background-color:transparent; border:1px solid rgba(255,255,255,0.3);}
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar {display : block;cursor: move; height: 40px; left: -3px; right: 5px; top: -6px; position: absolute;z-index: 110;background-color:transparent;}
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar:hover {background-color:#000; opacity: 0.4; background-clip: padding-box; padding: 6px 0 0 6px;}
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-size {display : block;cursor: nesw-resize; width:7px; height: 7px; right: -3px; top: -3px; position: absolute;z-index: 120;background-color:transparent;}
@@ -261,10 +260,10 @@ const BC = {
                 }
 
                 BC.player.fur = qs(".video-container .wrapper");
-                bar = d.createElement("div");
+                let bar = d.createElement("div");
                 bar.setAttribute('id', 's-marty-miniplayer-bar');
                 bar.addEventListener("mousedown", BC.moveMiniPlayer, true);
-                size = d.createElement("div");
+                let size = d.createElement("div");
                 size.setAttribute('id', 's-marty-miniplayer-size');
                 size.addEventListener("mousedown", BC.sizeMiniPlayer.bind(this), true);
                 BC.player.fur.insertBefore(bar, BC.player.fur.firstChild);
@@ -294,34 +293,52 @@ const BC = {
                     /* Video errors */
                 qs('progress.plyr__progress__buffer').style = '';
                 qs('div.plyr__progress').title = '';
-                BC.player.api.addEventListener('error', function(e) {
-                    let err = '';
-                    if (BC.player.api.error) {
-                        if (BC.player.api.error.code == BC.player.api.error.MEDIA_ERR_NETWORK) {
-                            err = 'File error';
+                if (isChrome) {
+                    if (Object.is(NaN, BC.player.api.duration)) {
+                        window.setTimeout(() => {
+                           if (BC.player.api.readyState === 0 && Object.is(NaN, BC.player.api.duration)) { 
+                                let err = null, f = '', n = parseInt(BC.player.api.children[0].attributes.dl.value);
+                                try { err = Bcd.src.videos[n].error; f = Bcd.src.videos[n].url}
+                                catch (e) { err = 'Undefined video error' }
+                                if (err) {
+                                    qs('progress.plyr__progress__buffer').style.backgroundColor = 'rgba(255,255,60,.80)';
+                                    qs('div.plyr__progress').title = err;
+                                    error(`media error ${err} ${f}`);
+                                }
+                            }
+                       }, 3000)
+                   }
+                }
+                else {
+                    BC.player.api.addEventListener('error', function(e) {
+                        let err = '';
+                        if (BC.player.api.error) {
+                            if (BC.player.api.error.code == BC.player.api.error.MEDIA_ERR_NETWORK)
+                                err = 'File error';
+                            else if (BC.player.api.error.code == BC.player.api.error.MEDIA_ERR_DECODE)
+                                err = 'Video file is corrupt';
+                            else if (BC.player.api.error.code == BC.player.api.error.MEDIA_ERR_SRC_NOT_SUPPORTED)
+                                err = 'Video file is incompatable';
                         }
-                        else if (BC.player.api.error.code == BC.player.api.error.MEDIA_ERR_DECODE) {
-                            err = 'Video file is corrupt';
+                        else {
+                            window.setTimeout(() => {
+                                let err = null, f = '', n = parseInt(e.target.attributes.dl.value);
+                                try { err = Bcd.src.videos[n].error; f = Bcd.src.videos[n].url}
+                                catch (e) { err = 'Undefined video error' }
+                                qs('progress.plyr__progress__buffer').style.backgroundColor = 'rgba(255,255,60,.80)';
+                                qs('div.plyr__progress').title = err;
+                                error(`media error ${err || "undefined"} ${f}`);
+                           }, 3000)
                         }
-                        else if (BC.player.api.error.code == BC.player.api.error.MEDIA_ERR_SRC_NOT_SUPPORTED) {
-                            err = 'Video file is incompatable';
-                        }
-                    }
-                    else err = 'Undefined video error';
-
-                    if (err || e.type == 'error') {
-                        qs('progress.plyr__progress__buffer').style.backgroundColor = 'rgba(255,255,60,.80)';
-                        qs('div.plyr__progress').title = err;
-                        error('media error ', err || "undefinedd");
-                    }
-                }, true);
+                    }, true);
+                }
 
                 BC.player.api.addEventListener('volumechange', function(e) {
                     BC.savePlayerValue('volume', (Math.round(e.target.volume / 0.01) * 0.01))
                 }, false);
             }
-            sidebarnext = qs(".sidebar-next");
-            playnext = qs("label.sidebar-autoplay:not(.active)");
+            let sidebarnext = qs(".sidebar-next");
+            let playnext = qs("label.sidebar-autoplay:not(.active)");
             if (sidebarnext && playnext) {
                 playnext.addEventListener('mousedown', function(e) {
                     if (e.which===1) {
@@ -348,6 +365,7 @@ const BC = {
             if (d.cookie.indexOf('sensitivity=') !=-1 && window.location.search.indexOf('showall=1') ==-1) {
                 d.cookie = "sensitivity=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
             }
+            let sensitivityWarning;
             if (sensitivityWarning = qs('.sensitivity-warning a')) sensitivityWarning.addEventListener('click', BC.addSensitivityCookie, false);
             if (BC.settings.useblacklist) BC.applyChannelBlacklist();
             BC.setChannelFeed('add');
@@ -355,9 +373,9 @@ const BC = {
         else if (BC.homepage || BC.categorypage) {
             BC.page = 'homepage';
             if (BC.settings.useblacklist) {
-                listingTabs = qs('#listing-tabs.listening');
-                listingsAll = qs('#listing-all > div.row');
-                listingsPopular = qs('#listing-popular > div.row');
+                let listingTabs = qs('#listing-tabs.listening');
+                let listingsAll = qs('#listing-all > div.row');
+                let listingsPopular = qs('#listing-popular > div.row');
                 BC.listingsAllHeight = Math.round(listingsAll.getBoundingClientRect().height);
                 BC.listingsPopHeight = Math.round(listingsPopular.getBoundingClientRect().height);
 
@@ -374,7 +392,7 @@ const BC = {
                     addListener(listingsAll, function(e) {
                         let newlistings = qs('#listing-all > div.row');
                         let newlistingsHeight = Math.round(newlistings.getBoundingClientRect().height);
-                        if (BC.listingsAllHeight > 100 && BC.listingsAllHeight < newlistingsHeight) {
+                        if (BC.listingsAllHeight < newlistingsHeight) {
                             BC.listingsAllHeight = newlistingsHeight;
                             BC.applyBlacklist('#listing-all > div.row > div');
                         }
@@ -383,7 +401,7 @@ const BC = {
                     addListener(listingsPopular, function(e) {
                         let newlistings = qs('#listing-popular > div.row');
                         let newlistingsHeight = Math.round(newlistings.getBoundingClientRect().height);
-                        if (BC.listingsPopHeight > 100 && BC.listingsPopHeight < newlistingsHeight) {
+                        if (BC.listingsPopHeight < newlistingsHeight) {
                             BC.listingsPopHeight = newlistingsHeight;
                             BC.applyBlacklist('#listing-popular > div.row > div');
                         }
@@ -399,7 +417,7 @@ const BC = {
             }
 
             if (homepage_go_to_all) {
-                preferAll = qs("ul.nav-tabs-list li a[href='#listing-all']");
+                let preferAll = qs("ul.nav-tabs-list li a[href='#listing-all']");
                 if (preferAll !== null && preferAll.parentNode.className.indexOf('active') ==-1) {
                     preferAll.dispatchEvent(new MouseEvent('click', {
                         bubbles: true,
@@ -417,30 +435,30 @@ const BC = {
 
 
     applyBlacklist: (selector, page) => {
-        let i, card, href, channel, button, videoCard, name, listings;
 
         BC.previouslisting = selector;
         if (page) BC.navsIni();
         if (!BC.settings.useblacklist) return;
         selector = selector.split(',').join(':not([polled]), ') + ':not([polled])';
-        listings = qsa(selector);
+        let i,
+            listings = qsa(selector);
 
         if (listings.length) {
             try {
                 for (i = 0; i < listings.length; i++) {
-                    card = qs('.video-card-channel a, .video-trending-channel a, .channel-card a', listings[i]);
+                    let card = qs('.video-card-channel a, .video-trending-channel a, .channel-card a', listings[i]);
                     if (card) {
-                        href = card.getAttribute("href");
-                        channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
+                        let href = card.getAttribute("href");
+                        let channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
                         if (channel) {
                             if (BC.blacklist.find( id => id[0] == channel[1] )) {
                                 listings[i].outerHTML = ''
                             }
                             else {
                                 listings[i].setAttribute('polled', channel[1]);
-                                button = BC.blacklistButton();
-                                videoCard = qs('.video-card, .video-trending-image, .channel-card', listings[i]);
-                                name = qs('.channel-card-title', listings[i]);
+                                let button = BC.blacklistButton();
+                                let videoCard = qs('.video-card, .video-trending-image, .channel-card', listings[i]);
+                                let name = qs('.channel-card-title', listings[i]);
                                 name = name ? name.innerText : card.innerText;
                                 videoCard.appendChild(button);
                                 button.addEventListener('click', function(e){ BC.blacklistAdd(e, channel[1], name) }, true);
@@ -454,21 +472,20 @@ const BC = {
 
 
     applyChannelBlacklist: () => {
-        let href, channel, button;
         let card = qs('.channel-banner .name a'),
             name = card.innerText;
 
         if (card) {
             try {
-                href = card.getAttribute("href");
-                channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
+                let href = card.getAttribute("href");
+                let channel = href.match( /\/channel\/([a-z0-9_-]+)\//i );
                 if (channel) {
                     if (BC.blacklist.find( id => id[0] == channel[1] )) {
                         card.setAttribute('title', name +' is blacklisted ☺');
                         card.classList.add('userisblacklisted')
                     }
                     else if (! qs('.add-to-blacklist', card.parentNode)) {
-                        button = BC.blacklistButton();
+                        let button = BC.blacklistButton();
                         card.parentNode.appendChild(button);
                         button.addEventListener('click', function(e){
                             BC.blacklistAdd(e, channel[1], name);
@@ -1059,9 +1076,8 @@ const BC = {
     },
 
 
-    isDark: false,
-    isTheme: false,
-    persistTryDT: 0,
+    isDark: false, isTheme: false, persistTryDT: 0,
+
     setTheme: () => {
         let c, theme, version, colours, style;
 
@@ -1096,7 +1112,8 @@ const BC = {
             style.type = "text/css";
             style.innerText = `
                 .night .sidebar-heading, .night .subscribe-button, .night .btn-danger, .night #loader ul li {background-color: ${c.dark};}
-                .night .playlist-card.active, .night .sidebar-recent .video-card.active {border: 1px solid ${c.lighter};} .night .nav-tabs>li.active {border-bottom-color:${c.dark};}
+                .night .sidebar-recent .video-card.active {box-shadow: 0 0 1em 0.2em ${c.lighter};} .night .nav-tabs>li.active {border-bottom-color:${c.dark};}
+                .night .playlist-card.active {border-top: 1px solid ${c.lighter}bb; box-shadow: 0 2px 1em 0.2em ${c.lighter};}
                 .night body, .night .video-card .video-card-text, .night .video-card .video-card-text p i, .night .notify-button,
                 .night .channel-notify-button, .night .channel-videos-details, .night .channel-videos-title a, .night .channel-videos-text,
                 .night .video-trending-details, .night .video-trending-title a, .night .video-trending-channel a, .night .video-trending-text,
@@ -1117,8 +1134,8 @@ const BC = {
     },
 
 
-    persistTryATL: 0,
-    buttonFound: false,
+    persistTryATL: 0, buttonFound: false,
+
     addThemeListeners: () => {
         let toDay   = qs('#day-theme a'),
             toNight = qs('#night-theme a');
@@ -1139,10 +1156,8 @@ const BC = {
     },
 
 
-    persistTryHC: 0,
-    showComments: null,
-    commentsFrame: null,
-    commentsUrl: '',
+    persistTryHC: 0, showComments: null, commentsFrame: null, commentsUrl: '',
+
     hideComments: (e) => {
         let comments = qs('#disqus_thread');
         let nocomments = qs('.video-no-discussion');
@@ -1181,6 +1196,7 @@ const BC = {
 
 
     fetchingMoreRecentVideos: 0,
+
     addMoreRecentVideos: (offset = -1, playlist = null) => {
         let data, link, csrf, xhr, sensitivity;
         let extend = "",
@@ -1399,6 +1415,7 @@ const BC = {
 
     fetchingMvplaylist: !1,
     mostViewedPlaylist: {slider:null,index:0,length:0,cardWidth:function(){let o = qs('.mvplaylist').getBoundingClientRect();return (!o || !o.width ? 0 : Math.round(o.width/240))}},
+
     addMostViewedPlaylist: () => {
         let el, comments, parent, row, csrf, xhr, data, showall;
         let link = qs('.details .name a'),
@@ -1518,8 +1535,8 @@ const BC = {
     },
 
 
-    playlists: {},
-    fetchingPlaylists: !1,
+    playlists: {}, fetchingPlaylists: !1,
+
     addChannelPlaylists: () => {
         let csrf, xhr, data, showall;
         let link = qs('.details .owner a');
@@ -1714,7 +1731,6 @@ const BC = {
                             useblacklist:true,hidecarousel:false,hidecomments:false,hidemenubar:true,hideadverts:true,useminiplayer:true};
             GM.getValue('player', "{}").then( value => {
                 if (value && value != '{}') {
-                    debug('>>>>>>>>>>>>>> BC init <<<<<<<<<<=');
                     let player = Object.assign({}, settings, JSON.parse(value));
                     BC.url = null;
                     BC.host = null;
@@ -1748,7 +1764,12 @@ const BC = {
                     }
                     GM.getValue('blacklist', "[]").then( value => {
                         BC.blacklist = JSON.parse(value);
-                        resolve(true);
+                        let err = qs("#page-bar .page-title");
+                            /* Server Error */
+                        if (!err || (err && !err.innerText.match(/.*((server)+\serror)+$/i))) {
+                            debug('>>>>>>>>>>>>>> BC init <<<<<<<<<<=');
+                            resolve(true);
+                        }
                     }).catch ( e => {
                         error('S_marty: Error in promise loading blacklist: '+ e);
                     });
@@ -2219,9 +2240,13 @@ const Bcd = {
                           resolve({size: e.total, vb: vb});
                       }
                       else {
-                          request.abort();
-                          valid = false;
-                          qs(".download_details.v"+ vb, Bcd.dialog).innerHTML = "";
+                          if (request.status !== 0) {
+                              var err = `Error: ${request.status} ${request.statusText}`;
+                              Bcd.src.videos[vb].error = err;
+                              valid = false;
+                              request.abort();
+                              qs(".download_details.v"+ vb, Bcd.dialog).innerHTML = err;
+                          }
                       }
                     });
                     request.addEventListener('error', function() {
@@ -2455,73 +2480,63 @@ const Bcd = {
 
 
     init: (e) => {
-        let ext, torrent, postersize;
-        let poster = {url: null, type: null, width: 0, height: 0};
+        let ext, source, torrent;
 
-        Bcd.videoSources = 0;
-        Bcd.src = {videos: []};
         debug('>>>>>>>>>>>>>> Bcd init <<<<<<<<<<=', e);
 
-        if (qs("title") && ! Bcd.loader) {
-            addListener(qs("title"), function(e) {
-              Bcd.init("loader");
-            },{ childList: true });
-            Bcd.loader = true;
-        }
-
-        if (! Bcd.unloader) {
-            window.addEventListener('beforeunload', (e) => {
-                try {
-                    let vdl = qs("#video_download_dialog");
-                    let svd = qs("style#video_download");
-                    if (vdl) vdl.parentNode.removeChild(vdl);
-                    if (svd) svd.parentNode.removeChild(svd);
-                } catch (e) {}
-            }, false);
-            Bcd.unloader = true;
-        }
-        Bcd.downloads = [];
-        Bcd.videoButtons = 0;
-        Bcd.downloadIndex = -1;
-        Bcd.download_poster = false;
-
-        if (Bcd.dialog) {
-            Bcd.dialog.parentNode.removeChild(Bcd.dialog);
-            Bcd.dialog = null;
-        }
-
         if (Bcd.playerAPI = qs("video#player")) {
+            Bcd.videoSources = 0;
+            Bcd.src = {videos: []};
+
+            if (qs("title") && ! Bcd.loader) {
+                addListener(qs("title"), function(e) {
+                  Bcd.init("loader");
+                },{ childList: true });
+                Bcd.loader = true;
+            }
+
+            if (! Bcd.unloader) {
+                window.addEventListener('beforeunload', (e) => {
+                    try {
+                        let vdl = qs("#video_download_dialog");
+                        let svd = qs("style#video_download");
+                        if (vdl) vdl.parentNode.removeChild(vdl);
+                        if (svd) svd.parentNode.removeChild(svd);
+                    } catch (e) {}
+                }, false);
+                Bcd.unloader = true;
+            }
+            Bcd.downloads = [];
+            Bcd.videoButtons = 0;
+            Bcd.downloadIndex = -1;
+            Bcd.download_poster = false;
+
+            if (Bcd.dialog) {
+                Bcd.dialog.parentNode.removeChild(Bcd.dialog);
+                Bcd.dialog = null;
+            }
+
             if (window.webtorrent) {
                 torrent = window.webtorrent.torrents[0];
-                torrent = new URL(torrent);
-                ext = torrent.slice(torrent.lastIndexOf('.'));
-                Bcd.src.videos[0] = {ext: ext, url: torrent.href, type: "Torrent", width: 0, height: 0};
-                Bcd.src.poster = new URL(Bcd.playerAPI.poster);
-                Bcd.src.poster = Bcd.src.poster.href;
-                if (! Bcd.playerAPI.error) Bcd.load("torrent", Bcd.src.videos[0])
+                torrent.on('ready', () => {
+                    source = torrent.urlList[0];
+                    Bcd.addSource({src: source, type: "torrent"});
+                })
             }
-            else {
-                poster.url = new URL(Bcd.playerAPI.poster);
-                poster.url = poster.url.href;
-                if (postersize = poster.url.match(/_(\d+)x(\d+)\./)) {
-                    poster.width = postersize[1];
-                    poster.height = postersize[2];
-                }
-                poster.type = qs('meta[property="og:image:type"]').content || "image/jpeg";
-                Bcd.src.poster = poster;
+            if (source = qs("source:not([dl])", Bcd.playerAPI)) {
+                Bcd.addSource(source);
+            }
 
-                Bcd.addSource(Bcd.playerAPI);
-                addListener(Bcd.playerAPI, function(e) {
-                    Bcd.addSource(e.target);
-                },{ childList: true, subtree: true });
-            }
+            addListener(Bcd.playerAPI, function(e) {
+                Bcd.addSource(e.target);
+            },{ childList: true, subtree: true });
 
             Bcd.playerAPI.addEventListener('loadedmetadata', function(e) {
                 let width = e.target.videoWidth,
                     height = e.target.videoHeight,
                     curSrc = e.target.currentSrc;
 
-                debug("Bcd.src.videos: ",Bcd.src.videos);
+                debug("loadedmetadata Bcd.src.videos: ", Bcd.src.videos);
                 Bcd.src.videos.forEach( (v, i) => {
                     debug("url = curSrc ? "+ (v.url == curSrc) +" url: "+v.url);
                     if (v.url == curSrc) {
@@ -2541,23 +2556,43 @@ const Bcd = {
             });
         }
         else if (window.location.pathname.indexOf('/video') !=-1) {
-            window.setTimeout(Bcd.init, 250)
+            if (e == "timed") {
+                let err = qs("#page-bar .page-title");
+                    /* Server Error */
+                if (err && err.innerText.match(/.*((server)+\serror)+$/i)) return
+            }
+            window.setTimeout(Bcd.init, 250, "timed")
         }
     },
 
 
-    addSource: (target) => {
-        let vid, ext, s;
-        let source = qs("source:not([dl])", target);
+    addSource: (source = null) => {
+        let vid, ext, s, poster, postersize;
 
-        if (source) {
+        if (!Bcd.download_poster) {
+            if (Bcd.playerAPI.poster) {
+                poster = {url: null, type: null, width: 0, height: 0};
+                poster.url = new URL(Bcd.playerAPI.poster);
+                poster.url = poster.url.href;
+                if (postersize = poster.url.match(/_(\d+)x(\d+)\./)) {
+                    poster.width = postersize[1];
+                    poster.height = postersize[2];
+                }
+                poster.type = qs('meta[property="og:image:type"]').content || "image/jpeg";
+                Bcd.src.poster = poster;
+                Bcd.download_poster = true
+            }
+        }
+        if (source && source.src) {
             ext = source.src.slice(source.src.lastIndexOf('.'));
             s = new URL(source.src);
-            vid = {ext: ext, url: s.href, type: source.type, width: 0, height: 0};
+            if (source.type == "torrent") source.type = "video/mp4 (torrent)";
+            else source.setAttribute("dl", Bcd.videoSources);
+            vid = {ext: ext, url: s.href, type: source.type, width: 0, height: 0, error: null};
             Bcd.src.videos.push(vid);
-            debug('Video source found:', s.href);
-            source.setAttribute("dl", Bcd.src.videos.length -1);
-            if (! Bcd.playerAPI.error) Bcd.load("source", vid)
+            debug(`Video source found: ${source.type}, ${s.href}`);
+            Bcd.load("source", vid);
+            Bcd.videoSources += 1
         }
     },
 
