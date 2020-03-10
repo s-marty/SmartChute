@@ -34,11 +34,18 @@ Most features are selectable using the Smarty menu.
 * Up to 25 playlist choices in sidebar when viewing playlists.
 * Blacklist annoying channels with one click if enabled
 * De-blacklist channels with two clicks using Smarty menu
+* Double-click the Smarty menu button for additional menu options.
 * Unfix top header to show only while up-scrolling
 * Hide the upper channel carousel using Smarty menu
 * Hide unsafe ads to avoid viruses or other malware
 * Hide or unhide comments section - make up your own mind  or not
 * Scrolls down to video player automatically if header is unfixed
+* Seek by single frame using <> (,.) keys while video is paused.
+* Mouse-over the progress bar for frame preview. (not for slow conn.)
+* &nbsp;&nbsp;Requires ~8mB additional bandwidth for a 640x360 video.
+* Volume indicator visible when using ↑↓ keys.
+* Full screen forward/back navigation, autoplay or not.
+* Take and edit a downloadable screenshot of the current video frame.
 * Autoplay videos or not is now selectable
 * Video volume is persisted - No More 100% volume the first play
 * Theme night/day is persisted when clicking the sun/moon icon
@@ -92,9 +99,25 @@ The four color selection choices select an optional text color when using night 
 The bottom menu section contains a scrollable list of blocked, annoying, fake, ridiculous, propagandistic, repetitive, lunatic, or just plain undesired channels that do not need to be seen. 
 Clicking on the channel name will remove it from the list.
 
-![Download Icon](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/downloadLink.png)
+---
+<br/>
 
-**Download Icon**
+<br/>
+
+![Aux menu](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/auxMenu.png)
+
+**Additional Features Menu**
+<br/>
+Previously undocumented and script-editable options are now easily available by double-clicking the Smarty button.
+
+---
+<br/>
+
+<br/>
+
+![Download-Screenshot Icons](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/actionLinks.png)
+
+**Download, Screenshot Icons**
 
 ---
 <br/>
@@ -104,6 +127,32 @@ Clicking on the channel name will remove it from the list.
 ![Download Modal](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/downloadModal.png)
 
 **Download Modal**
+<br/>
+Allows downloading of video and/or poster image. Caption text file download is provided when/if they activate that feature.
+
+---
+<br/>
+
+<br/>
+
+![Save and Edit Screenshot Widget](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/editor1.png)
+
+**Save and Edit Screenshot Widget**
+<br/>
+Download the screenshot as-is, or transform the PNG image to suit. The sissors button will take you to the widget below.
+
+---
+<br/>
+
+<br/>
+
+![Crop, Resize Widget](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/editor2.png)
+
+**Crop and Resize Screenshot Widget**
+<br/>
+This is a basic image editor and therefore allows for one resize and one crop, or one resized crop procedure only.
+Drag the side tabs to their desired location. The corner tabs will drag proportionately.
+There is no undo or redo options.
 
 ---
 <br/>
@@ -113,6 +162,45 @@ Clicking on the channel name will remove it from the list.
 ![Playlist Container](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/playlist.png)
 
 **Playlist Container**
+
+---
+<br/>
+
+<br/>
+
+![Seekbar preview](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/seekbarPreview.png)
+
+**Seekbar Preview**
+<br/>
+Runnimg the mouse pointer over the seekbar will popup a video frame capture near to that position as with some other video players.
+This feature will naturally slow down your browser to some degree. Therefore you may wish to disable it via the Additional Features Menu if you are using an older browser or are on a slow internet network connection.
+The additional download bandwidth is approximately 8 mB for a 640x360 video of any length.
+The tiny images are loaded asynchronously in the background from left to right, and remain blank until that point is reached.
+Please note that canvas blocking software or addons will cripple this feature.
+
+---
+<br/>
+
+<br/>
+
+![Volume Indicator](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/vol.png)
+
+**Volume Indicator**
+<br/>
+Pressing the up or down keyboard keys while the normal volume slider is hidden will display a thermometer style display at the right side of the video.
+Will work for full screen and mini player too!
+
+---
+<br/>
+
+<br/>
+
+![Video Error Indicator](https://raw.githubusercontent.com/s-marty/SmartChute/master/images/videoError.png)
+
+**Video Error Indicator**
+<br/>
+Ever have a video that just won't play? 
+Video errors now will change the buffering seek bar to yellow and provide the error -if available- in a titled popup under the mouse pointer.
 
 ---
 <br/>
