@@ -73,7 +73,7 @@
 ***  ***  Does not & will not work well with IE and IEdge  ***/
 
 /* Editable options */
-const BC_Debug = true;
+const BC_Debug = false;
 /* End Editable options */
 
 
