@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         20.3.11
+// @version         20.6.2
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -2200,18 +2200,17 @@ const BC = {
     },
 
 
-    thumbas: null, thumbPlayerUrl: "", thumbs: [], thumbsLoaded: false,
+    thumbas: null, thumbPlayerUrl: "", thumbs: [], thumbsLoaded: false, thWidth: 0,
 
     getVideoThumbnails: (e) => {
         let src, context,
             vid = e.target,
-            width = vid.videoWidth,
-            height = vid.videoHeight,
             seconds = vid.duration;
         if (vid.id == "thumbPlayer") {
             BC.thumbas = dce("canvas");
             BC.thumbas.style.display = "none";
-            BC.thumbas.width = 160;
+            BC.thWidth = Math.ceil(vid.videoWidth / vid.videoHeight * 90);
+            BC.thumbas.width = BC.thWidth;
             BC.thumbas.height = 90;
             vid.currentTime = 0.0333;
         }
@@ -2224,7 +2223,7 @@ const BC = {
             debug("GetVideoThumbnails: "+ src.src);
             vid = dce("video");
             vid.style.display = "none";
-            vid.setAttribute("width", "160");
+            vid.setAttribute("width", BC.thWidth);
             vid.setAttribute("height", "90");
             vid.setAttribute("muted", "muted");
             vid.setAttribute("id", "thumbPlayer");
@@ -2233,7 +2232,7 @@ const BC = {
                 let secs, vid = e.target;
                 if (BC.thumbPlayerUrl == e.target.currentSrc) {
                     context = BC.thumbas.getContext("2d");
-                    context.drawImage(vid, 0, 0, 160, 90);
+                    context.drawImage(vid, 0, 0, BC.thumbas.width, 90);
                     let img = new Image();
                     img.src = BC.thumbas.toDataURL();
                     BC.thumbs.push(img);
@@ -2244,17 +2243,19 @@ const BC = {
                         BC.thumbas = null;
                     }
                     if (BC.thumbs.length > 6 && !BC.thumbsLoaded) {
+                        if (qs('#bcframes')) qs('#bcframes').parentNode.removeChild(qs('#bcframes'));
                         qs(".plyr__progress").addEventListener('mousemove', function(e) {
                             var fr = (BC.isFullScreen) ? qs(".plyr #bcframes") : qs("body > #bcframes");
                             var rect = e.target.getBoundingClientRect();
                             var key = Math.round(75 / rect.width * (e.pageX - rect.left));
                             var x = w.innerWidth || d.documentElement.clientWidth || d.body.clientWidth;
                             key = parseInt((key < 0) ? 0 : (key > 74) ? 74 : key);
-                            var left = (e.pageX - 80 < 20) ? 20 : 
-                                       (e.pageX + 180 > x) ? x - 180: e.pageX - 80;
+                            var left = (e.pageX - (BC.thWidth / 2) < 20) ? 20 :
+                                       (e.pageX + (BC.thWidth + 20) > x) ? x - (BC.thWidth + 20): e.pageX - (BC.thWidth / 2);
                             if (!fr) {
                                 fr = dce("div");
                                 fr.id = "bcframes";
+                                fr.style.width = BC.thWidth +'px';
                                 if (BC.isFullScreen) qs(".wrapper .plyr").appendChild(fr);
                                 else qs("body").appendChild(fr);
                             }
