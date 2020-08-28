@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            SmartChute
-// @version         20.6.2
+// @version         20.8.28
 // @description     BitChute.com Enhancer. Adds missing features. Makes you feel warm.
 // @license         MIT
 // @author          S-Marty
@@ -157,8 +157,8 @@ const BC = {
                 #smarty_tab #smartymm > div, #smarty_tab #blacklistedchannels, #smarty_tab #smartyam {padding: 8px; border: 1px solid #333; border-radius:3px;} #smarty_tab #blacklistedchannels span{width: 137px; max-height: 16px;cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;}
                 span.add-to-blacklist svg {cursor: pointer;} html.noblacklist span.add-to-blacklist {display:none;} #channel-list div.item div.channel-card:hover .add-to-blacklist {opacity: 1;} .video-views, .video-duration {color: #272727; opacity: 0.8;}
                 span.add-to-blacklist:hover span.blacklist-tooltip { color:#fff; display:inline; } #carousel {${BC.settings.hidecarousel ? "display:none" : "width: 100%; min-height: 210px"};} .plyr__tooltip {color: #000;}
-                #carousel .hidden-md > div .channel-card:hover .action-button {opacity:1;} .channel-banner .name a.userisblacklisted {text-decoration: line-through red;} .night .video-views, .night .video-duration {color: #dbdbdb;}
-                .channel-banner .name .add-to-blacklist {position: relative;left: 10px;} .channel-banner .name:hover .add-to-blacklist {opacity: 1;}
+                #carousel .hidden-md > div .channel-card:hover .action-button {opacity:1;} .channel-banner .name a.userisblacklisted {text-decoration: line-through red;} .night .video-views, .night .video-duration {color: #dbdbdb;} html.night .jquery-comments .textarea-wrapper .textarea {background-color: #000 !important;}
+                .night .jquery-comments ul.main li.comment .comment-wrapper {border-top-color: #dddddd33 !important;}, .channel-banner .name .add-to-blacklist {position: relative;left: 10px;} .channel-banner .name:hover .add-to-blacklist {opacity: 1;}
                 .smartybox { position: relative; display: block; width: 100%; } .smartybox:nth-child(2) {  width: 132px; } .smartybox input[type="checkbox"], .smartybox input[type="radio"] { width: auto; opacity: 0.00000001; position: absolute; left: 0; margin-left: -20px; }
                 .cbhelper, .radiohelper { top: -4px; left: -8px; display: block; cursor: pointer; position: absolute; user-select: none; -moz-user-select: none; -khtml-user-select: none; -webkit-user-select: none;} .cbhelper:before, .radiohelper:before { content: ''; position: absolute; left: 0; top: 0;
                   margin: 6px; width: 18px; height: 18px; transition: transform 0.28s ease; border-radius: 5px; border: 1px solid #4d4b4e; }
@@ -186,7 +186,7 @@ const BC = {
                 #autoplay-next .video-card {position:absolute;width: 240px;border-radius: 10px;opacity:.9;background:#211f22;box-shadow: 1em 1em 1em 0.7em #000000a0, -0.05em -0.05em 0.1em 0.1em white;}
                 .autoplay-prev {left:0px;} .autoplay-prev img.play-overlay {width: 64px !important;height: 64px !important;transform: scaleX(-0.7) !important;} .autoplay-prev:hover img.play-overlay {transform: scaleX(-1) !important;}
                 .autoplay-next {right:0px;} .autoplay-next img.play-overlay {width: 64px !important;height: 64px !important;transform: scaleX(0.7) !important;} .autoplay-next:hover img.play-overlay {transform: scaleX(1) !important;}
-                #bcframes {opacity: 0; width: 160px; height: 90px; position: absolute; border-radius: 3px; border: 1px solid #555; background-color: #222222aa; overflow: hidden; transform: translate(50%,10px) scale(0); transform-origin: -50% 100%; transition: transform .2s .1s ease,opacity .2s .1s ease; z-index: 130;}
+                #bcframes {opacity: 0; height: 90px; position: absolute; border-radius: 3px; border: 1px solid #555; background-color: #222222aa; overflow: hidden; transform: translate(50%,10px) scale(0); transform-origin: -50% 100%; transition: transform .2s .1s ease,opacity .2s .1s ease; z-index: 130;}
                 #bcframes.visible {opacity: 1; transform: translate(0,0) scale(1); transform-origin: 50% 100%; transition: transform .2s .1s ease,opacity .2s .1s ease;}
                 #screenshot {transition: opacity .5s; background: #222222b3; text-align: center; position: fixed; overflow: hidden; z-index: 2000; opacity: 1; bottom: 0; right: 0; left: 0; top: 0;}
                 #screenshot canvas {top: 50%; z-index: 2001; max-width: 80%; max-height: 80%; position: relative; transform: translateY(-50%); box-shadow: 1em 1em 1em 0.7em #000000a0, -0.01em -0.01em 0.03em 0.03em #aaa;} #screenshot .action {left: calc(50% - 114px); position: absolute;
@@ -306,7 +306,7 @@ const BC = {
                             style.type = "text/css";
                             style.innerText = `
                                 html:not(.isfullscreen).s-marty-miniplayer video#player, html:not(.isfullscreen).s-marty-miniplayer .plyr__video-wrapper, html:not(.isfullscreen).s-marty-miniplayer .plyr--video {opacity: 0.94;}
-                                html:not(.isfullscreen).s-marty-miniplayer .video-container .wrapper {position: fixed;z-index: 100;background-color:transparent; border:1px solid rgba(255,255,255,0.3);}
+                                html:not(.isfullscreen).s-marty-miniplayer .video-container > .row > div > .wrapper {position: fixed;z-index: 100;background-color:transparent; border:1px solid rgba(255,255,255,0.3);}
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar {display : block;cursor: move; height: 40px; left: -3px; right: 5px; top: -6px; position: absolute;z-index: 110;background-color:transparent;}
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-bar:hover {background-color:#000; opacity: 0.4; background-clip: padding-box; padding: 6px 0 0 6px;}
                                 html:not(.isfullscreen).s-marty-miniplayer #s-marty-miniplayer-size {display : block;cursor: nesw-resize; width:7px; height: 7px; right: -3px; top: -3px; position: absolute;z-index: 120;background-color:transparent;}
@@ -1311,12 +1311,12 @@ const BC = {
                 .night .channel-notify-button, .night .channel-videos-details, .night .channel-videos-title a, .night .channel-videos-text,
                 .night .video-trending-details, .night .video-trending-title a, .night .video-trending-channel a, .night .video-trending-text,
                 .night .playlist-video .details, .night .playlist-video .title a, .night .playlist-video .channel a, .night .playlist-video .description,
-                .night #smarty_tab label, .night #smarty_tab #blacklistedchannels span,
-                .night .video-detail-text p, .night .video-information .sharing-drop span, .night #nav-top-menu .search-box .form-control { color: ${c.lightest};}
-                .night a:link, .night a:active, .night a:visited, .night a:focus, .night .scripted-link, .night #nav-top-menu .unauth-link a, .night #nav-side-menu .side-toggle,
+                .night #smarty_tab label, .night #smarty_tab #blacklistedchannels span, .night .jquery-comments ul.main li.comment time,
+                .night .video-detail-text p, .night .video-information .sharing-drop span, .night #nav-top-menu .search-box .form-control, .jquery-comments .no-data { color: ${c.lightest};}
+                .night a:link, .night a:active, .night a:visited, .night a:focus, .night .scripted-link, .night #nav-top-menu .unauth-link a, .night .jquery-comments ul.navigation li,
                 .night .video-card .video-card-text a, .night #nav-top-menu .user-link a, .night #day-theme a svg, .night .search-icon svg { color: ${c.lighter};}
                 .night #nav-side-menu .side-toggle:hover, .night #day-theme a svg:hover, .night .search-icon svg:hover, .night #smarty_tab label:hover, .night #smarty_tab #blacklistedchannels span:hover,
-                .night a:hover, .night .scripted-link:hover, .night #screenshot .cancel:hover, .night #screenshot .save a:hover {color: ${c.dark} !important;}
+                .night a:hover, .night .scripted-link:hover, .night #screenshot .cancel:hover, .night #screenshot .save a:hover, .night .jquery-comments ul.navigation li.active, .night .jquery-comments ul.navigation li:hover {color: ${c.dark} !important;}
                 .night #video_download_dialog button[disabled]:not(.download_finished):not(.download_error):hover {background-color: ${c.dark} !important;}
                 .night .tags ul li a, .night #show-comments {background-color: #3b383c; border-radius:5px;} .night .tags ul li a:hover {background-color: #4d484e;} .creator-monetization {color: #30a247;}
                 .night .channel-banner .name a.userisblacklisted {text-decoration-color: yellow;} .night #video_download_dialog hr {background: linear-gradient(to right, #211f22 0%, ${c.dark} 50%, ${c.dark} 50%, #211f22 100%) !important;}
@@ -1349,38 +1349,31 @@ const BC = {
     },
 
 
-    persistTryHC: 0, showComments: null, commentsFrame: null, commentsUrl: '',
+    persistTryHC: 0, showComments: null,
 
     hideComments: (e) => {
-        let comments = qs('#disqus_thread');
-        let nocomments = qs('.video-no-discussion');
+        let comments = qs('#comments-container');
         let container = qs('#comment-frm-container');
+        let comment_cnt = qsa('#comments-container li.comment');
+        let nocomments = qs('.video-no-comments p') && !qs('.video-no-comments a');
         BC.showComments = qs('#comment-frm-container > #show-comments');
 
         if (nocomments || BC.showComments) return;
         if (container && comments) {
-            comments.style.display = 'none';
-            if (BC.commentsFrame = qs('iframe', comments)) {
-                BC.commentsUrl = BC.commentsFrame.getAttribute('src')
-            }
-            if (BC.commentsFrame && BC.commentsUrl) {
-                BC.commentsFrame.contentWindow.location.replace('about:blank');
-            }
-            else {
+            if (qs('#comments-container #comment-list') === null) {
                 if (BC.persistTryHC++ < 60 && !BC.showComments)
                     setTimeout(BC.hideComments, 1000);
                 return
             }
             BC.showComments = dce("div");
             BC.showComments.id = 'show-comments';
-            BC.showComments.innerHTML = '<span class="scripted-link">Show Comments</span>';
+            BC.showComments.innerHTML = '<span class="scripted-link">Show '+ comment_cnt.length +' Comments</span>';
             BC.showComments.style = "width:100%;height:38px;margin:0px;padding:8px;text-align:center;border-radius:5px;";
             container.insertBefore(BC.showComments, comments);
             comments.style.display = 'none';
             BC.showComments.addEventListener('click', function(e) {
                 if (e.which===1) {
-                    qs('#disqus_thread').style.display = 'block';
-                    BC.commentsFrame.contentWindow.location.replace(BC.commentsUrl);
+                    qs('#comments-container').style.display = 'block';
                     this.style.display = 'none';
                 }
             }, false);
@@ -3288,6 +3281,7 @@ const Bcd = {
                         }
                     }
                 });
+/* ===================================================================================== */
             }
         }
         else {
