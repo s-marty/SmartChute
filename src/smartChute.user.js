@@ -1367,7 +1367,7 @@ const BC = {
             }
             BC.showComments = dce("div");
             BC.showComments.id = 'show-comments';
-            BC.showComments.innerHTML = '<span class="scripted-link">Show '+ comment_cnt.length +' Comments</span>';
+            BC.showComments.innerHTML = `<span class="scripted-link">Show ${comment_cnt.length} Comment${comment_cnt.length === 1 ? '' : 's'}</span>`;
             BC.showComments.style = "width:100%;height:38px;margin:0px;padding:8px;text-align:center;border-radius:5px;";
             container.insertBefore(BC.showComments, comments);
             comments.style.display = 'none';
