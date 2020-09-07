@@ -253,7 +253,8 @@ const BC = {
                     .night .playlistbtn.disabled b {color: #2c2a2d;} @media (min-width: 768px) {.plslider, .mvslider {max-width: 660px;} .playlistup {margin-left:475px;}.mvplaylist.row, .playlist.row {width: 505px;}}
                     @media (min-width: 992px) {.plslider, .mvslider {max-width: 878px;} .playlistup {margin-left:693px;}.mvplaylist.row, .playlist.row {width: 723px;}}`;
             }
-            if (BC.settings.hidedonationbar) style.innerText += '.video-container .text-center {display: none !important;}';
+            /* Allow "The owner has disabled comments" message & the donation bar has been discontinued at this time */
+            //if (BC.settings.hidedonationbar) style.innerText += '.video-container .text-center {display: none !important;}';
             if (BC.settings.hidecookienotice) style.innerText += '#alert-cookie {display: none !important;}';
             if (BC.settings.hidesignupnotice) style.innerText += '#alert-signup {display: none !important;}';
             if (BC.settings.usesquareicons) style.innerText += '.channel-banner .image-container {border-radius:0px !important;}';
@@ -620,7 +621,7 @@ const BC = {
             <input name="color" value="green" type="radio"${BC.settings.color == 'green' ? ' checked':''}><i class="radiohelper r3 tabinput"></i></label>&nbsp;</span></div>
           </div><div id="blacklistedchannels" style="border-top:none;"><div><em>No Blacklist</em></div></div></div><div id="smartyam" style="width: 198px; display: none;">
             <div class="smartybox"><label class="tabinput" style="margin-bottom: 0px;" for="usesquareicons2"><input name="usesquareicons" id="usesquareicons2" type="checkbox"${BC.settings.usesquareicons ? ' checked':''} class="tabinput"> <i class="cbhelper tabinput"></i>&nbsp;Use Square Icons</label></div>
-            <div class="smartybox"><label class="tabinput" style="margin-bottom: 0px;" for="hidedonationbar2"><input name="hidedonationbar" id="hidedonationbar2" type="checkbox"${BC.settings.hidedonationbar ? ' checked':''} class="tabinput"> <i class="cbhelper tabinput"></i>&nbsp;Hide Donation Bar</label></div>
+            <!-- <div class="smartybox"><label class="tabinput" style="margin-bottom: 0px;" for="hidedonationbar2"><input name="hidedonationbar" id="hidedonationbar2" type="checkbox"${BC.settings.hidedonationbar ? ' checked':''} class="tabinput"> <i class="cbhelper tabinput"></i>&nbsp;Hide Donation Bar</label></div> -->
             <div class="smartybox"><label class="tabinput" style="margin-bottom: 0px;" for="homepagegotoall2"><input name="homepagegotoall" id="homepagegotoall2" type="checkbox"${BC.settings.homepagegotoall ? ' checked':''} class="tabinput"> <i class="cbhelper tabinput"></i>&nbsp;Homepage Goto All</label></div>
             <div class="smartybox"><label class="tabinput" style="margin-bottom: 0px;" for="hidecookienotice2"><input name="hidecookienotice" id="hidecookienotice2" type="checkbox"${BC.settings.hidecookienotice ? ' checked':''} class="tabinput"> <i class="cbhelper tabinput"></i>&nbsp;Hide Cookie Notice</label></div>
             <div class="smartybox"><label class="tabinput" style="margin-bottom: 0px;" for="hidesignupnotice2"><input name="hidesignupnotice" id="hidesignupnotice2" type="checkbox"${BC.settings.hidesignupnotice ? ' checked':''} class="tabinput"> <i class="cbhelper tabinput"></i>&nbsp;Hide Signup Notice</label></div>
@@ -658,7 +659,7 @@ const BC = {
             qs('#playlists2', smarty).addEventListener('change', function(e) {BC.savePlayerValue('playlists',e.target.checked)}, false);
             qs('#autoplay2', smarty).addEventListener('change', function(e) {BC.savePlayerValue('autoplay',e.target.checked)}, false);
             qs('#usesquareicons2', smarty).addEventListener('change', function(e) {BC.toggleSettings('usesquareicons',e.target.checked)}, false);
-            qs('#hidedonationbar2', smarty).addEventListener('change', function(e) {BC.toggleSettings('hidedonationbar',e.target.checked)}, false);
+            //qs('#hidedonationbar2', smarty).addEventListener('change', function(e) {BC.toggleSettings('hidedonationbar',e.target.checked)}, false);
             qs('#homepagegotoall2', smarty).addEventListener('change', function(e) {BC.toggleSettings('homepagegotoall',e.target.checked)}, false);
             qs('#hidecookienotice2', smarty).addEventListener('change', function(e) {BC.toggleSettings('hidecookienotice',e.target.checked)}, false);
             qs('#hidesignupnotice2', smarty).addEventListener('change', function(e) {BC.toggleSettings('hidesignupnotice',e.target.checked)}, false);
